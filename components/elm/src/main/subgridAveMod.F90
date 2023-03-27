@@ -1572,7 +1572,7 @@ contains
     ! each landunit type depending on l2g_scale_type
     !
     ! !USES:
-    use landunit_varcon, only : istsoil, istcrop, istice, istice_mec, istdlak
+    use landunit_varcon, only : istsoil, istcrop, istice, istice_mec, istdlak, istwet
     use landunit_varcon, only : isturb_MIN, isturb_MAX, max_lunit
     !
     ! !ARGUMENTS:
@@ -1609,8 +1609,10 @@ contains
         scale_lookup(:) = 1.0_r8
      else if (trim(l2g_scale_type) == 'natveg') then
         scale_lookup(istsoil) = 1.0_r8
+        scale_lookup(istwet) = 1.0_r8
      else if (trim(l2g_scale_type) == 'veg') then
         scale_lookup(istsoil) = 1.0_r8
+        scale_lookup(istwet) = 1.0_r8
         scale_lookup(istcrop) = 1.0_r8
      else if (trim(l2g_scale_type) == 'ice') then
         scale_lookup(istice) = 1.0_r8
@@ -1635,7 +1637,7 @@ contains
     ! each landunit type depending on l2t_scale_type for the topounit based structure the same way to l2g_scale_type TKT
     !
     ! !USES:
-    use landunit_varcon, only : istsoil, istcrop, istice, istice_mec, istdlak
+    use landunit_varcon, only : istsoil, istcrop, istice, istice_mec, istdlak, istwet
     use landunit_varcon, only : isturb_MIN, isturb_MAX, max_lunit
     !
     ! !ARGUMENTS:
@@ -1651,8 +1653,10 @@ contains
         scale_lookup(:) = 1.0_r8
      else if (l2t_scale_type == 'natveg') then
         scale_lookup(istsoil) = 1.0_r8
+        scale_lookup(istwet) = 1.0_r8
      else if (l2t_scale_type == 'veg') then
         scale_lookup(istsoil) = 1.0_r8
+        scale_lookup(istwet) = 1.0_r8
         scale_lookup(istcrop) = 1.0_r8
      else if (l2t_scale_type == 'ice') then
         scale_lookup(istice) = 1.0_r8
