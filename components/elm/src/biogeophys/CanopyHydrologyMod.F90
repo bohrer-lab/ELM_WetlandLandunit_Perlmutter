@@ -115,7 +115,8 @@ contains
      ! !USES:
      use elm_varcon         , only : hfus, denice, zlnd, rpi, spval, tfrz
      use column_varcon      , only : icol_roof, icol_sunwall, icol_shadewall
-     use landunit_varcon    , only : istcrop, istice, istwet, istsoil, istice_mec, istdlak
+     use landunit_varcon   , only : istwet
+  use landunit_varcon    , only : istcrop, istice, istwet, istsoil, istice_mec, istdlak
      use elm_varctl         , only : subgridflag
      use elm_varpar         , only : nlevsoi,nlevsno
      use elm_varsur         , only : wt_lunit, f_grd, f_surf
@@ -278,7 +279,7 @@ contains
           ! Canopy interception and precipitation onto ground surface
           ! Add precipitation to leaf water
 
-          if (ltype(l)==istsoil .or. ltype(l)==istwet .or. urbpoi(l) .or. &
+          if (( ltype(l)==istsoil .or. ltype(l)==istwet ) .or. ltype(l)==istwet .or. urbpoi(l) .or. &
                ltype(l)==istcrop) then
 
              qflx_candrip(p) = 0._r8      ! rate of canopy runoff
@@ -642,7 +643,7 @@ contains
           end if !end of do_capsnow construct
 
           ! set frac_sno_eff variable
-          if (ltype(l) == istsoil .or. ltype(l) == istcrop) then
+          if (( ltype(l) == istsoil .or. ltype(l) == istwet ) .or. ltype(l) == istcrop) then
              if (subgridflag ==1) then 
                 frac_sno_eff(c) = frac_sno(c)
              else
@@ -652,10 +653,10 @@ contains
              frac_sno_eff(c) = 1._r8
           endif
 
-          if (ltype(l)==istwet .and. t_grnd(c)>tfrz) then
-             h2osno(c)=0._r8
-             snow_depth(c)=0._r8
-          end if
+          !if (ltype(l)==istwet .and. t_grnd(c)>tfrz) then
+             !h2osno(c)=0._r8
+             !snow_depth(c)=0._r8
+          !end if
 
           ! When the snow accumulation exceeds 10 mm, initialize snow layer
           ! Currently, the water temperature for the precipitation is simply set
@@ -783,7 +784,8 @@ contains
      ! !USES:
      use shr_const_mod   , only : shr_const_pi
      use shr_spfn_mod    , only : erf => shr_spfn_erf
-     use landunit_varcon , only : istsoil, istcrop
+     use landunit_varcon   , only : istwet
+  use landunit_varcon , only : istsoil, istcrop
      !
      ! !ARGUMENTS:
      type(bounds_type)     , intent(in)           :: bounds           
@@ -820,7 +822,7 @@ contains
           l = col_pp%landunit(c)
           qflx_h2osfc2topsoi(c) = 0._r8
           ! h2osfc only calculated for soil vegetated land units
-          if (lun_pp%itype(l) == istsoil .or. lun_pp%itype(l) == istcrop) then
+          if (( lun_pp%itype(l) == istsoil .or. lun_pp%itype(l) == istwet ) .or. lun_pp%itype(l) == istcrop) then
 
              !  Use newton-raphson method to iteratively determine frac_h20sfc
              !  based on amount of surface water storage (h2osfc) and 

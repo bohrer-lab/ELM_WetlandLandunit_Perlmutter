@@ -9,6 +9,7 @@ module CNStateType
   use elm_varpar     , only : nlevsno, nlevgrnd, nlevlak, nlevsoifl, nlevsoi, crop_prog
   use elm_varpar     , only : ndecomp_cascade_transitions, nlevdecomp, nlevdecomp_full, more_vertlayers  
   use elm_varcon     , only : spval, ispval, c14ratio, grlnd
+  use landunit_varcon   , only : istwet
   use landunit_varcon, only : istsoil, istcrop
   use elm_varpar     , only : nlevsno, nlevgrnd, nlevlak, crop_prog 
   use elm_varctl     , only : use_vertsoilc, use_c14, use_cn 
@@ -1023,7 +1024,7 @@ contains
           end do
        end if
 
-       if (lun_pp%itype(l) == istsoil .or. lun_pp%itype(l) == istcrop) then
+       if (( lun_pp%itype(l) == istsoil .or. lun_pp%itype(l) == istwet ) .or. lun_pp%itype(l) == istcrop) then
           this%annsum_counter_col(c) = 0._r8   
           this%annavg_t2m_col(c)     = 280._r8 
 
@@ -1101,7 +1102,7 @@ contains
 
     do p = bounds%begp,bounds%endp
        l = veg_pp%landunit(p)
-       if (lun_pp%itype(l) == istsoil .or. lun_pp%itype(l) == istcrop) then
+       if (( lun_pp%itype(l) == istsoil .or. lun_pp%itype(l) == istwet ) .or. lun_pp%itype(l) == istcrop) then
 
           this%rc14_atm_patch(p) = c14ratio
 

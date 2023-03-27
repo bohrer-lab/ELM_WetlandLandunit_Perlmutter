@@ -175,9 +175,11 @@ contains
     use elm_varpar               , only : nlevsno, nlevgrnd, nlevurb
     use elm_varctl               , only : iulog
     use elm_varcon               , only : cnfac, cpice, cpliq, denh2o
-    use landunit_varcon          , only : istice, istice_mec, istsoil, istcrop
+    use landunit_varcon   , only : istwet
+  use landunit_varcon          , only : istice, istice_mec, istsoil, istcrop
     use column_varcon            , only : icol_roof, icol_sunwall, icol_shadewall, icol_road_perv, icol_road_imperv
-    use landunit_varcon          , only : istwet, istice, istice_mec, istsoil, istcrop
+    use landunit_varcon   , only : istwet
+  use landunit_varcon          , only : istwet, istice, istice_mec, istsoil, istcrop
     use BandDiagonalMod          , only : BandDiagonal
 
     !
@@ -677,9 +679,9 @@ contains
             if (j == 1) then ! this only needs to be done once
                eflx_fgr12(c) = -cnfac*fn(c,1) - (1._r8-cnfac)*fn1(c,1)
             end if
-            if (j > 0 .and. j < nlevgrnd .and. (lun_pp%itype(l) == istsoil .or. lun_pp%itype(l) == istcrop)) then
+            if (j > 0 .and. j < nlevgrnd .and. (( lun_pp%itype(l) == istsoil .or. lun_pp%itype(l) == istwet ) .or. lun_pp%itype(l) == istcrop)) then
                eflx_fgr(c,j) = -cnfac*fn(c,j) - (1._r8-cnfac)*fn1(c,j)
-            else if (j == nlevgrnd .and. (lun_pp%itype(l) == istsoil .or. lun_pp%itype(l) == istcrop)) then
+            else if (j == nlevgrnd .and. (( lun_pp%itype(l) == istsoil .or. lun_pp%itype(l) == istwet ) .or. lun_pp%itype(l) == istcrop)) then
                eflx_fgr(c,j) = 0._r8
             end if
 
@@ -720,8 +722,10 @@ contains
     use elm_varpar       , only : nlevsno, nlevgrnd, nlevurb
     use elm_varctl       , only : iulog
     use elm_varcon       , only : cnfac, cpice, cpliq, denh2o
-    use landunit_varcon  , only : istice, istice_mec, istsoil, istcrop
-    use landunit_varcon  , only : istwet, istice, istice_mec, istsoil, istcrop
+    use landunit_varcon   , only : istwet
+  use landunit_varcon  , only : istice, istice_mec, istsoil, istcrop
+    use landunit_varcon   , only : istwet
+  use landunit_varcon  , only : istwet, istice, istice_mec, istsoil, istcrop
     use BandDiagonalMod  , only : BandDiagonal
     !
     ! !ARGUMENTS:
@@ -832,7 +836,8 @@ contains
       !$acc routine seq
     use elm_varpar      , only : nlevsno, nlevgrnd, nlevurb, nlevsoi
     use elm_varcon      , only : denh2o, denice, tfrz, tkwat, tkice, tkair, cpice,  cpliq, thk_bedrock
-    use landunit_varcon , only : istice, istice_mec, istwet
+    use landunit_varcon   , only : istwet
+  use landunit_varcon , only : istice, istice_mec, istwet
     use column_varcon   , only : icol_roof, icol_sunwall, icol_shadewall, icol_road_perv, icol_road_imperv
     use elm_varctl      , only : iulog
     !
@@ -911,7 +916,7 @@ contains
                   thk(c,j) = tk_roof(l,j)
                else if (col_pp%itype(c) == icol_road_imperv .and. j >= 1 .and. j <= nlev_improad(l)) then
                   thk(c,j) = tk_improad(l,j)
-               else if (lun_pp%itype(l) /= istwet .AND. lun_pp%itype(l) /= istice .AND. lun_pp%itype(l) /= istice_mec &
+               else if (lun_pp%itype(l) /= istice .AND. lun_pp%itype(l) /= istice_mec &
                     .AND. col_pp%itype(c) /= icol_sunwall .AND. col_pp%itype(c) /= icol_shadewall .AND. &
                     col_pp%itype(c) /= icol_roof) then
 
@@ -934,13 +939,13 @@ contains
                else if (lun_pp%itype(l) == istice .OR. lun_pp%itype(l) == istice_mec) then
                   thk(c,j) = tkwat
                   if (t_soisno(c,j) < tfrz) thk(c,j) = tkice
-               else if (lun_pp%itype(l) == istwet) then
-                  if (j > nlevbed) then
-                     thk(c,j) = thk_bedrock
-                  else
-                     thk(c,j) = tkwat
-                     if (t_soisno(c,j) < tfrz) thk(c,j) = tkice
-                  endif
+               !else if (lun_pp%itype(l) == istwet) then
+                  !if (j > nlevbed) then
+                     !thk(c,j) = thk_bedrock
+                  !else
+                     !thk(c,j) = tkwat
+                     !if (t_soisno(c,j) < tfrz) thk(c,j) = tkice
+                  !endif
                endif
             endif
 
@@ -1007,13 +1012,13 @@ contains
                cv(c,j) = cv_roof(l,j) * dz(c,j)
             else if (col_pp%itype(c) == icol_road_imperv .and. j >= 1 .and. j <= nlev_improad(l)) then
                cv(c,j) = cv_improad(l,j) * dz(c,j)
-            else if (lun_pp%itype(l) /= istwet .AND. lun_pp%itype(l) /= istice .AND. lun_pp%itype(l) /= istice_mec &
+            else if (lun_pp%itype(l) /= istice .AND. lun_pp%itype(l) /= istice_mec &
                  .AND. col_pp%itype(c) /= icol_sunwall .AND. col_pp%itype(c) /= icol_shadewall .AND. &
                  col_pp%itype(c) /= icol_roof) then
                cv(c,j) = csol(c,j)*(1._r8-watsat(c,j))*dz(c,j) + (h2osoi_ice(c,j)*cpice + h2osoi_liq(c,j)*cpliq)
-            else if (lun_pp%itype(l) == istwet) then
-               cv(c,j) = (h2osoi_ice(c,j)*cpice + h2osoi_liq(c,j)*cpliq)
-               if (j > nlevbed) cv(c,j) = csol(c,j)*dz(c,j)
+            !else if (lun_pp%itype(l) == istwet) then
+               !cv(c,j) = (h2osoi_ice(c,j)*cpice + h2osoi_liq(c,j)*cpliq)
+               !if (j > nlevbed) cv(c,j) = csol(c,j)*dz(c,j)
             else if (lun_pp%itype(l) == istice .OR. lun_pp%itype(l) == istice_mec) then
                cv(c,j) = (h2osoi_ice(c,j)*cpice + h2osoi_liq(c,j)*cpliq)
             endif
@@ -1280,7 +1285,8 @@ contains
     use elm_varctl       , only : iulog
     use elm_varcon       , only : tfrz, hfus, grav
     use column_varcon    , only : icol_roof, icol_sunwall, icol_shadewall, icol_road_perv
-    use landunit_varcon  , only : istsoil, istcrop, istice_mec
+    use landunit_varcon   , only : istwet
+  use landunit_varcon  , only : istsoil, istcrop, istice_mec
     !
     ! !ARGUMENTS:
     type(bounds_type)      , intent(in)    :: bounds
@@ -1424,7 +1430,7 @@ contains
 
                ! from Zhao (1997) and Koren (1999)
                supercool(c,j) = 0.0_r8
-               if (lun_pp%itype(l) == istsoil .or. lun_pp%itype(l) == istcrop .or. col_pp%itype(c) == icol_road_perv) then
+               if (( lun_pp%itype(l) == istsoil .or. lun_pp%itype(l) == istwet ) .or. lun_pp%itype(l) == istcrop .or. col_pp%itype(c) == icol_road_perv) then
                   if(t_soisno(c,j) < tfrz) then
                      smp = hfus*(tfrz-t_soisno(c,j))/(grav*t_soisno(c,j)) * 1000._r8  !(mm)
                      supercool(c,j) = watsat(c,j)*(smp/sucsat(c,j))**(-1._r8/bsw(c,j))
@@ -1632,7 +1638,7 @@ contains
          l = col_pp%landunit(c)
          if (lun_pp%urbpoi(l)) then
             eflx_snomelt_u(c) = eflx_snomelt(c)
-         else if (lun_pp%itype(l) == istsoil .or. lun_pp%itype(l) == istcrop) then
+         else if (( lun_pp%itype(l) == istsoil .or. lun_pp%itype(l) == istwet ) .or. lun_pp%itype(l) == istcrop) then
             eflx_snomelt_r(c) = eflx_snomelt(c)
          end if
       end do

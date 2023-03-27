@@ -90,7 +90,7 @@ contains
 
     SHR_ASSERT((ltype >= 1 .and. ltype <= max_lunit), subname//': ltype out of bounds')
 
-    if (ltype == istsoil .or. ltype == istcrop) then
+    if (( ltype == istsoil .or. ltype == istwet ) .or. ltype == istcrop) then
        is_special = .false.
     else
        is_special = .true.

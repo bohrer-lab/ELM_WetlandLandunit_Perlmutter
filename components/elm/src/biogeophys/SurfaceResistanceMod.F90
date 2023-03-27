@@ -104,7 +104,8 @@ contains
      use shr_const_mod   , only : SHR_CONST_PI
      use decompMod       , only : bounds_type
      use elm_varcon      , only : denh2o, denice
-     use landunit_varcon , only : istice, istice_mec, istwet, istsoil, istcrop
+     use landunit_varcon   , only : istwet
+  use landunit_varcon , only : istice, istice_mec, istwet, istsoil, istcrop
      use column_varcon   , only : icol_roof, icol_sunwall, icol_shadewall
      use column_varcon   , only : icol_road_imperv, icol_road_perv
      use ColumnType      , only : col_pp
@@ -139,9 +140,9 @@ contains
        do fc = 1,num_nolakec
           c = filter_nolakec(fc)
           l = col_pp%landunit(c)
-          if (lun_pp%itype(l)/=istwet .AND. lun_pp%itype(l)/=istice  &
+          if (lun_pp%itype(l)/=istice  &
                .AND. lun_pp%itype(l)/=istice_mec) then
-             if (lun_pp%itype(l) == istsoil .or. lun_pp%itype(l) == istcrop) then
+             if (( lun_pp%itype(l) == istsoil .or. lun_pp%itype(l) == istwet ) .or. lun_pp%itype(l) == istcrop) then
                 wx   = (h2osoi_liq(c,1)/denh2o+h2osoi_ice(c,1)/denice)/col_pp%dz(c,1)
                 fac  = min(1._r8, wx/watsat(c,1))
                 fac  = max( fac, 0.01_r8 )

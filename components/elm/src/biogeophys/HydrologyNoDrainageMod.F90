@@ -64,7 +64,8 @@ contains
     ! !USES:
       !$acc routine seq
     use elm_varcon           , only : denh2o, denice, hfus, grav, tfrz
-    use landunit_varcon      , only : istice, istwet, istsoil, istice_mec, istcrop, istdlak
+    use landunit_varcon   , only : istwet
+  use landunit_varcon      , only : istice, istwet, istsoil, istice_mec, istcrop, istdlak
     use column_varcon        , only : icol_roof, icol_road_imperv, icol_road_perv, icol_sunwall
     use column_varcon        , only : icol_shadewall
     use elm_varctl           , only : use_cn, use_betr, use_fates, use_pflotran, pf_hmode
@@ -437,7 +438,7 @@ contains
             t_soi_10cm(c) = t_soi_10cm(c)/0.1_r8
             tsoi17(c) =  tsoi17(c)/0.17_r8         ! F. Li and S. Levis
          end if
-         if (lun_pp%itype(l)==istsoil .or. lun_pp%itype(l)==istcrop) then
+         if (( lun_pp%itype(l)==istsoil .or. lun_pp%itype(l)==istwet ) .or. lun_pp%itype(l)==istcrop) then
             t_grnd_r(c) = t_soisno(c,snl(c)+1)
          end if
 

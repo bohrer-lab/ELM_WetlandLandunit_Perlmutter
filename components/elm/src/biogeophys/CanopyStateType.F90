@@ -6,6 +6,7 @@ module CanopyStateType
   use shr_log_mod     , only : errMsg => shr_log_errMsg
   use abortutils      , only : endrun
   use decompMod       , only : bounds_type
+  use landunit_varcon   , only : istwet
   use landunit_varcon , only : istsoil, istcrop
   use elm_varcon      , only : spval,ispval
   use elm_varpar      , only : nlevcan, nvegwcs
@@ -481,7 +482,7 @@ contains
        this%dewmx_patch(p)      = 0.1_r8
        this%vegwp_patch(p,:)    = -2.5e4_r8
 
-       if (lun_pp%itype(l) == istsoil .or. lun_pp%itype(l) == istcrop) then
+       if (( lun_pp%itype(l) == istsoil .or. lun_pp%itype(l) == istwet ) .or. lun_pp%itype(l) == istcrop) then
           this%laisun_patch(p) = 0._r8
           this%laisha_patch(p) = 0._r8
        end if
@@ -498,7 +499,7 @@ contains
     do c = bounds%begc, bounds%endc
        l = col_pp%landunit(c)
 
-       if (lun_pp%itype(l) == istsoil .or. lun_pp%itype(l) == istcrop) then
+       if (( lun_pp%itype(l) == istsoil .or. lun_pp%itype(l) == istwet ) .or. lun_pp%itype(l) == istcrop) then
           this%alt_col(c)               = 0._r8 !iniitialized to spval for all columns
           this%altmax_col(c)            = 0._r8 !iniitialized to spval for all columns
           this%altmax_lastyear_col(c)   = 0._r8 !iniitialized to spval for all columns

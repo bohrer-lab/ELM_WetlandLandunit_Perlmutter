@@ -18,6 +18,7 @@ module TotalWaterAndHeatMod
   use LakeStateType      , only : lakestate_type
   use column_varcon      , only : icol_roof, icol_sunwall, icol_shadewall
   use column_varcon      , only : icol_road_perv, icol_road_imperv
+  use landunit_varcon   , only : istwet
   use landunit_varcon    , only : istdlak, istsoil,istcrop,istwet,istice,istice_mec
   use LandunitType       , only : lun_pp
   use ColumnType         , only : col_pp
@@ -267,7 +268,7 @@ contains
     do fc = 1, num_nolakec
        c = filter_nolakec(fc)
        l = col_pp%landunit(c)
-       if ( (lun_pp%itype(l) == istsoil .or. lun_pp%itype(l) == istcrop          )  &
+       if ( (( lun_pp%itype(l) == istsoil .or. lun_pp%itype(l) == istwet ) .or. lun_pp%itype(l) == istcrop          )  &
             .or. (lun_pp%itype(l) == istwet                                   )  &
             .or. (lun_pp%itype(l) == istice                                   )  &
             .or. (lun_pp%itype(l) == istice_mec                               )  &
@@ -276,7 +277,7 @@ contains
        end if
        l = col_pp%landunit(c)
 
-       if (lun_pp%itype(l) == istsoil .or. lun_pp%itype(l) == istcrop) then   ! note: soil specified at LU level
+       if (( lun_pp%itype(l) == istsoil .or. lun_pp%itype(l) == istwet ) .or. lun_pp%itype(l) == istcrop) then   ! note: soil specified at LU level
           do p = col_pp%pfti(c),col_pp%pftf(c) ! loop over patches
              if (veg_pp%active(p)) then
                 liquid_mass(c) = liquid_mass(c) + h2ocan_patch(p) * veg_pp%wtcol(p)
@@ -586,7 +587,7 @@ contains
              if (col_pp%itype(c) == icol_road_imperv .and. j <= nlev_improad(l)) then
                 heat_dry_mass(c) = heat_dry_mass(c) + &
                      TempToHeat(t_soisno(c,j),(cv_improad(l,j) * dz(c,j)))
-             else if (lun_pp%itype(l) /= istwet .and. lun_pp%itype(l) /= istice .and. lun_pp%itype(l) /= istice_mec) then
+             else if (lun_pp%itype(l) /= istice .and. lun_pp%itype(l) /= istice_mec) then
                 ! Note that this also includes impervious roads below nlev_improad (where
                 ! we have soil)
                 heat_dry_mass(c) = heat_dry_mass(c) + &

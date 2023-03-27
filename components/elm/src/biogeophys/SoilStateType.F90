@@ -11,10 +11,12 @@ module SoilStateType
   use ncdio_pio       , only : ncd_pio_openfile, ncd_inqfdims, ncd_pio_closefile, ncd_inqdid, ncd_inqdlen
   use elm_varpar      , only : more_vertlayers, numpft, numrad
   use elm_varpar      , only : nlevsoi, nlevgrnd, nlevlak, nlevsoifl, nlayer, nlayert, nlevurb, nlevsno
+  use landunit_varcon   , only : istwet
   use landunit_varcon , only : istice, istdlak, istwet, istsoil, istcrop, istice_mec
   use column_varcon   , only : icol_roof, icol_sunwall, icol_shadewall, icol_road_perv, icol_road_imperv 
   use elm_varcon      , only : zsoi, dzsoi, zisoi, spval, namet, grlnd
   use elm_varcon      , only : secspday, pc, mu, denh2o, denice, grlnd
+  use landunit_varcon   , only : istwet
   use landunit_varcon , only : istice, istdlak, istwet, istsoil, istcrop, istice_mec
   use column_varcon   , only : icol_roof, icol_sunwall, icol_shadewall, icol_road_perv, icol_road_imperv
   use elm_varctl      , only : use_cn, use_lch4,use_dynroot, use_fates
@@ -407,7 +409,7 @@ contains
 
     do c = bounds%begc,bounds%endc
        this%rootfr_col (c,nlevsoi+1:nlevgrnd) = 0._r8
-       if (lun_pp%itype(l) == istsoil .or. lun_pp%itype(l) == istcrop) then
+       if (( lun_pp%itype(l) == istsoil .or. lun_pp%itype(l) == istwet ) .or. lun_pp%itype(l) == istcrop) then
           this%rootfr_col (c,nlevsoi+1:nlevgrnd) = 0._r8
        else if (lun_pp%itype(l) == istdlak .and. allowlakeprod) then
           this%rootfr_col (c,:) = spval
@@ -588,7 +590,7 @@ contains
        topi = grc_pp%topi(g)
        ti = t - topi + 1
 
-       if (lun_pp%itype(l)==istwet .or. lun_pp%itype(l)==istice .or. lun_pp%itype(l)==istice_mec) then
+       if (lun_pp%itype(l)==istice .or. lun_pp%itype(l)==istice_mec) then
 
           do lev = 1,nlevgrnd
              this%bsw_col(c,lev)    = spval
@@ -613,11 +615,11 @@ contains
              this%tkmg_col(c,lev)   = spval
              this%tksatu_col(c,lev) = spval
              this%tkdry_col(c,lev)  = spval
-             if (lun_pp%itype(l)==istwet .and. lev > nlevbed) then
-                this%csol_col(c,lev) = csol_bedrock
-             else
+             !if (lun_pp%itype(l)==istwet .and. lev > nlevbed) then
+                !this%csol_col(c,lev) = csol_bedrock
+             !else
                 this%csol_col(c,lev)= spval
-             endif
+             !endif
           end do
 
        else if (lun_pp%urbpoi(l) .and. (col_pp%itype(c) /= icol_road_perv) .and. (col_pp%itype(c) /= icol_road_imperv) )then
@@ -971,7 +973,8 @@ contains
     use domainLateralMod       , only : ExchangeColumnLevelGhostData
     use shr_infnan_mod         , only : shr_infnan_isnan
     use shr_infnan_mod         , only : isnan => shr_infnan_isnan
-    use landunit_varcon        , only : max_lunit
+    use landunit_varcon   , only : istwet
+  use landunit_varcon        , only : max_lunit
     !
     implicit none
     !

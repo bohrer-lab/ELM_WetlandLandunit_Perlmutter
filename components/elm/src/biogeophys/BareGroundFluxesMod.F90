@@ -47,7 +47,8 @@ contains
     use elm_varpar           , only : nlevgrnd
     use elm_varcon           , only : cpair, vkc, grav, denice, denh2o
     use elm_varctl           , only : iulog, use_lch4
-    use landunit_varcon      , only : istsoil, istcrop
+    use landunit_varcon   , only : istwet
+  use landunit_varcon      , only : istsoil, istcrop
     use FrictionVelocityMod  , only : FrictionVelocity, MoninObukIni, implicit_stress
     use QSatMod              , only : QSat
     use SurfaceResistanceMod , only : do_soilevap_beta
@@ -404,7 +405,7 @@ contains
 
          rh_ref2m(p) = min(100._r8, q_ref2m(p) / qsat_ref2m * 100._r8)
 
-         if (lun_pp%itype(l) == istsoil .or. lun_pp%itype(l) == istcrop) then
+         if (( lun_pp%itype(l) == istsoil .or. lun_pp%itype(l) == istwet ) .or. lun_pp%itype(l) == istcrop) then
             rh_ref2m_r(p) = rh_ref2m(p)
             t_ref2m_r(p) = t_ref2m(p)
          end if

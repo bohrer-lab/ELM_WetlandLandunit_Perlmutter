@@ -21,6 +21,9 @@ module SurfaceRadiationMod
   use ColumnType        , only : col_pp
   use ColumnDataType    , only : col_ws
   use VegetationType    , only : veg_pp
+  use landunit_varcon   , only : istwet
+  use landunit_varcon   , only : istwet
+  use landunit_varcon   , only : istwet
   use landunit_varcon   , only : istdlak
 
   use timeinfoMod
@@ -327,7 +330,10 @@ contains
       !$acc routine seq
      use elm_varpar       , only : numrad, nlevsno
      use elm_varcon       , only : spval, degpsec, isecspday
-     use landunit_varcon  , only : istsoil, istcrop
+     use landunit_varcon   , only : istwet
+  use landunit_varcon   , only : istwet
+  use landunit_varcon   , only : istwet
+  use landunit_varcon  , only : istsoil, istcrop
      use elm_varctl       , only : subgridflag, use_snicar_frc
      use SnowSnicarMod    , only : DO_SNO_OC
      !
@@ -484,7 +490,7 @@ contains
           sabg(p)       = 0._r8
           sabv(p)       = 0._r8
           fsa(p)        = 0._r8
-        if (lun_pp%itype(l)==istsoil .or. lun_pp%itype(l)==istcrop) then
+        if (( lun_pp%itype(l)==istsoil .or. lun_pp%itype(l)==istwet ) .or. lun_pp%itype(l)==istcrop) then
            fsa_r(p) = 0._r8
         end if
           sabg_lyr(p,:) = 0._r8
@@ -521,7 +527,7 @@ contains
              if (ib == 1) then
                 parveg(p) = cad(p,ib) + cai(p,ib)
              end if
-             if (lun_pp%itype(l)==istsoil .or. lun_pp%itype(l)==istcrop) then
+             if (( lun_pp%itype(l)==istsoil .or. lun_pp%itype(l)==istwet ) .or. lun_pp%itype(l)==istcrop) then
                 fsa_r(p)  = fsa_r(p)  + cad(p,ib) + cai(p,ib)
              end if
 
@@ -538,7 +544,7 @@ contains
              absrad  = trd(p,ib)*(1._r8-albgrd(c,ib)) + tri(p,ib)*(1._r8-albgri(c,ib))
              sabg(p) = sabg(p) + absrad
              fsa(p)  = fsa(p)  + absrad
-             if (lun_pp%itype(l)==istsoil .or. lun_pp%itype(l)==istcrop) then
+             if (( lun_pp%itype(l)==istsoil .or. lun_pp%itype(l)==istwet ) .or. lun_pp%itype(l)==istcrop) then
                 fsa_r(p)  = fsa_r(p)  + absrad
              end if
              if (snl(c) == 0) then
@@ -678,7 +684,7 @@ contains
           endif
 
           ! Diagnostic: shortwave penetrating ground (e.g. top layer)
-          if (lun_pp%itype(l) == istsoil .or. lun_pp%itype(l) == istcrop) then
+          if (( lun_pp%itype(l) == istsoil .or. lun_pp%itype(l) == istwet ) .or. lun_pp%itype(l) == istcrop) then
              sabg_pen(p) = sabg(p) - sabg_lyr(p, snl(c)+1)
           end if
 

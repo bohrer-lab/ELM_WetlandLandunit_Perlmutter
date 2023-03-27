@@ -15,6 +15,7 @@ module CH4Mod
   use elm_varpar         , only : nlevsoi, ngases, nlevsno, nlevdecomp
   use elm_varcon         , only : denh2o, denice, tfrz, grav, spval, rgas, grlnd
   use elm_varcon         , only : catomw, s_con, d_con_w, d_con_g, c_h_inv, kh_theta, kh_tbase
+  use landunit_varcon   , only : istwet
   use landunit_varcon    , only : istdlak
   use clm_time_manager   , only : get_step_size, get_nstep
   use elm_varctl         , only : iulog, use_cn, use_lch4, use_fates
@@ -673,7 +674,8 @@ contains
     ! !USES:
     use shr_kind_mod    , only : r8 => shr_kind_r8
     use elm_varpar      , only : nlevsoi, nlevgrnd, nlevdecomp
-    use landunit_varcon , only : istsoil, istdlak, istcrop
+    use landunit_varcon   , only : istwet
+  use landunit_varcon , only : istsoil, istdlak, istcrop
     use elm_varctl      , only : iulog, fsurdat
     use CH4varcon       , only : allowlakeprod, usephfact, fin_use_fsat
     use spmdMod         , only : masterproc
@@ -790,7 +792,7 @@ contains
        this%o2_decomp_depth_unsat_col(c,:)= spval
 
        l = col_pp%landunit(c)
-       if (lun_pp%itype(l) == istsoil .or. lun_pp%itype(l) == istcrop) then
+       if (( lun_pp%itype(l) == istsoil .or. lun_pp%itype(l) == istwet ) .or. lun_pp%itype(l) == istcrop) then
 
           this%conc_ch4_sat_col   (c,1:nlevsoi) = 0._r8
           this%conc_ch4_unsat_col (c,1:nlevsoi) = 0._r8
@@ -851,7 +853,7 @@ contains
        this%ch4stress_unsat_col        (c,nlevsoi+1:nlevgrnd) = 0._r8
        this%ch4stress_sat_col          (c,nlevsoi+1:nlevgrnd) = 0._r8
 
-       if (lun_pp%itype(l) == istsoil .or. lun_pp%itype(l) == istcrop) then
+       if (( lun_pp%itype(l) == istsoil .or. lun_pp%itype(l) == istwet ) .or. lun_pp%itype(l) == istcrop) then
 
           this%conc_ch4_lake_col       (c,:) = spval
           this%conc_o2_lake_col        (c,:) = spval

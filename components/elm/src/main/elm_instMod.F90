@@ -261,7 +261,8 @@ contains
     ! initialize biogeophysical variables
     !
     use shr_scam_mod                      , only : shr_scam_getCloseLatLon
-    use landunit_varcon                   , only : istice, istice_mec, istsoil
+    use landunit_varcon   , only : istwet
+  use landunit_varcon                   , only : istice, istice_mec, istsoil
     use elm_varcon                        , only : h2osno_max, bdsno
     use domainMod                         , only : ldomain
     use elm_varpar                        , only : nlevsno, numpft
@@ -310,7 +311,7 @@ contains
            if (lun_pp%itype(l)==istice) then
                h2osno_col(c) = h2osno_max
            elseif (lun_pp%itype(l)==istice_mec .or. &
-               (lun_pp%itype(l)==istsoil .and. ldomain%glcmask(g) > 0._r8)) then
+               (( lun_pp%itype(l)==istsoil .or. lun_pp%itype(l)==istwet ) .and. ldomain%glcmask(g) > 0._r8)) then
                ! Initialize a non-zero snow thickness where the ice sheet can/potentially operate.
                ! Using glcmask to capture all potential vegetated points around GrIS (ideally
                ! we would use icemask from CISM, but that isn't available until after initialization.)
@@ -331,7 +332,7 @@ contains
            if (lun_pp%itype(l)==istice .or. lun_pp%itype(l)==istice_mec) then
               ! land ice (including multiple elevation classes, i.e. glacier_mec)
               h2osno_col(c) = 50._r8
-           else if (lun_pp%itype(l)==istsoil .and. grc_pp%latdeg(g) >= 44._r8) then
+           else if (( lun_pp%itype(l)==istsoil .or. lun_pp%itype(l)==istwet ) .and. grc_pp%latdeg(g) >= 44._r8) then
               ! Northern hemisphere seasonal snow
               h2osno_col(c) = 50._r8
            else

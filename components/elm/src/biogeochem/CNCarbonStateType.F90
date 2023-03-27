@@ -8,6 +8,7 @@ module CNCarbonStateType
   use elm_varpar             , only : ndecomp_cascade_transitions, ndecomp_pools, nlevcan
   use elm_varpar             , only : nlevdecomp_full, crop_prog, nlevdecomp
   use elm_varcon             , only : spval, ispval, dzsoi_decomp, zisoi, zsoi
+  use landunit_varcon   , only : istwet
   use landunit_varcon        , only : istcrop 
   use elm_varctl             , only : iulog, use_vertsoilc, spinup_state 
   use decompMod              , only : bounds_type
@@ -399,7 +400,8 @@ contains
     ! Initializes time varying variables used only in coupled carbon-nitrogen mode (CN):
     !
     ! !USES:
-    use landunit_varcon , only: istsoil
+    use landunit_varcon   , only : istwet
+  use landunit_varcon , only: istsoil
     use pftvarcon       , only: noveg, npcropmin
     !
     ! !ARGUMENTS:
@@ -450,7 +452,7 @@ contains
           this%leafcmax_patch(p) = 0._r8
 
           l = veg_pp%landunit(p)
-          if (lun_pp%itype(l) == istsoil .or. lun_pp%itype(l) == istcrop) then
+          if (( lun_pp%itype(l) == istsoil .or. lun_pp%itype(l) == istwet ) .or. lun_pp%itype(l) == istcrop) then
 
              if (veg_pp%itype(p) == noveg) then
                 this%leafc_patch(p)         = 0._r8
@@ -569,7 +571,7 @@ contains
     ! initialize column-level variables
     do c = bounds%begc, bounds%endc
        l = col_pp%landunit(c)
-       if (lun_pp%itype(l) == istsoil .or. lun_pp%itype(l) == istcrop) then
+       if (( lun_pp%itype(l) == istsoil .or. lun_pp%itype(l) == istwet ) .or. lun_pp%itype(l) == istcrop) then
 
 
           this%cwdc_col(c)       = 0._r8

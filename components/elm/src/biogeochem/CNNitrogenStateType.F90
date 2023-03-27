@@ -8,6 +8,7 @@ module CNNitrogenStateType
   use elm_varpar             , only : ndecomp_cascade_transitions, ndecomp_pools, nlevcan
   use elm_varpar             , only : nlevdecomp_full, nlevdecomp, crop_prog
   use elm_varcon             , only : spval, ispval, dzsoi_decomp, zisoi
+  use landunit_varcon   , only : istwet
   use landunit_varcon        , only : istcrop, istsoil 
   use elm_varctl             , only : use_vertsoilc, use_century_decomp
   use elm_varctl             , only : iulog, override_bgc_restart_mismatch_dump, spinup_state
@@ -506,7 +507,7 @@ contains
     do p = bounds%begp,bounds%endp
 
        l = veg_pp%landunit(p)
-       if (lun_pp%itype(l) == istsoil .or. lun_pp%itype(l) == istcrop) then       
+       if (( lun_pp%itype(l) == istsoil .or. lun_pp%itype(l) == istwet ) .or. lun_pp%itype(l) == istcrop) then       
           if (veg_pp%itype(p) == noveg) then
              this%leafn_patch(p) = 0._r8
              this%leafn_storage_patch(p) = 0._r8
@@ -579,7 +580,7 @@ contains
 
     do c = bounds%begc, bounds%endc
        l = col_pp%landunit(c)
-       if (lun_pp%itype(l) == istsoil .or. lun_pp%itype(l) == istcrop) then
+       if (( lun_pp%itype(l) == istsoil .or. lun_pp%itype(l) == istwet ) .or. lun_pp%itype(l) == istcrop) then
 
           ! column nitrogen state variables
           this%ntrunc_col(c) = 0._r8

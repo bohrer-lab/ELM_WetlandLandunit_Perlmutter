@@ -264,7 +264,8 @@ contains
      use elm_varcon       , only : denh2o, denice, roverg, wimp, pc, mu, tfrz
      use elm_varcon       , only : pondmx, watmin
      use column_varcon    , only : icol_roof, icol_road_imperv, icol_sunwall, icol_shadewall, icol_road_perv
-     use landunit_varcon  , only : istsoil, istcrop
+     use landunit_varcon   , only : istwet
+  use landunit_varcon  , only : istsoil, istcrop
      use clm_time_manager , only : get_step_size, get_nstep
      use atm2lndType      , only : atm2lnd_type ! land river two way coupling
      use lnd2atmType      , only : lnd2atm_type
@@ -390,7 +391,7 @@ contains
           c = filter_hydrologyc(fc)
           g = cgridcell(c)
           ! partition moisture fluxes between soil and h2osfc
-          if (lun_pp%itype(col_pp%landunit(c)) == istsoil .or. lun_pp%itype(col_pp%landunit(c))==istcrop) then
+          if (( lun_pp%itype(col_pp%landunit(c)) == istsoil .or. lun_pp%itype(col_pp%landunit(c)) == istwet ) .or. lun_pp%itype(col_pp%landunit(c))==istcrop) then
 
              ! explicitly use frac_sno=0 if snl=0
              if (snl(c) >= 0) then

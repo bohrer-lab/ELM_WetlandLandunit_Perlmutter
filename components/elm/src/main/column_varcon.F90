@@ -7,6 +7,7 @@ module column_varcon
   ! !USES:
 #include "shr_assert.h"
   use shr_log_mod    , only : errMsg => shr_log_errMsg
+  use landunit_varcon   , only : istwet
   use landunit_varcon, only : isturb_MIN
   !
   ! !PUBLIC TYPES:
@@ -47,7 +48,8 @@ contains
     ! about anywhere, really), you should use the pre-set col%hydrologically_active(c).
     !
     ! !USES:
-    use landunit_varcon, only : istsoil, istcrop
+    use landunit_varcon   , only : istwet
+  use landunit_varcon, only : istsoil, istcrop
     !
     ! !ARGUMENTS:
     logical :: hydrologically_active  ! function result
@@ -62,7 +64,7 @@ contains
     ! If we had an easy way to figure out which landunit a column was on based on
     ! col_itype (which would be very helpful!), then we wouldn't need lun_itype.
 
-    if (lun_itype == istsoil .or. lun_itype == istcrop) then
+    if (( lun_itype == istsoil .or. lun_itype == istwet ) .or. lun_itype == istcrop) then
        hydrologically_active = .true.
     else if (col_itype == icol_road_perv) then
        hydrologically_active = .true.
@@ -80,7 +82,8 @@ contains
     !
     ! !USES:
     use elm_varpar, only : maxpatch_glcmec
-    use landunit_varcon, only : istice_mec
+    use landunit_varcon   , only : istwet
+  use landunit_varcon, only : istice_mec
     !
     ! !ARGUMENTS:
     integer :: col_itype                ! function result
@@ -105,7 +108,8 @@ contains
     !
     ! !USES:
     use elm_varpar, only : maxpatch_glcmec
-    use landunit_varcon, only : istice_mec
+    use landunit_varcon   , only : istwet
+  use landunit_varcon, only : istice_mec
     !
     ! !ARGUMENTS:
     integer :: icemec_class          ! function result

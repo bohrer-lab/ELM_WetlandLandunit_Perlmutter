@@ -273,7 +273,8 @@ contains
     ! !USES:
     use decompMod , only : BOUNDS_LEVEL_CLUMP
     use pftvarcon , only : npcropmin, nppercropmin
-    use landunit_varcon, only : istsoil, istcrop, istice_mec
+    use landunit_varcon   , only : istwet
+  use landunit_varcon, only : istsoil, istcrop, istice_mec
     use column_varcon, only : icol_road_perv
     !
     ! !ARGUMENTS:
@@ -358,7 +359,7 @@ contains
        if (top_pp%active(t)) then
           if (col_pp%active(c) .or. include_inactive) then
              l =col_pp%landunit(c)
-             if (lun_pp%itype(l) == istsoil .or. lun_pp%itype(l) == istcrop) then
+             if (( lun_pp%itype(l) == istsoil .or. lun_pp%itype(l) == istwet ) .or. lun_pp%itype(l) == istcrop) then
                 fs = fs + 1
                 this_filter(nc)%soilc(fs) = c
              end if
@@ -375,7 +376,7 @@ contains
        if (top_pp%active(t)) then
           if (veg_pp%active(p) .or. include_inactive) then
              l =veg_pp%landunit(p)
-             if (lun_pp%itype(l) == istsoil .or. lun_pp%itype(l) == istcrop) then
+             if (( lun_pp%itype(l) == istsoil .or. lun_pp%itype(l) == istwet ) .or. lun_pp%itype(l) == istcrop) then
                 fs = fs + 1
                 this_filter(nc)%soilp(fs) = p
              end if
@@ -393,7 +394,7 @@ contains
        if (top_pp%active(t)) then
           if (col_pp%active(c) .or. include_inactive) then
              l =col_pp%landunit(c)
-             if (lun_pp%itype(l) == istsoil .or. col_pp%itype(c) == icol_road_perv .or. &
+             if (( lun_pp%itype(l) == istsoil .or. lun_pp%itype(l) == istwet ) .or. col_pp%itype(c) == icol_road_perv .or. &
                   lun_pp%itype(l) == istcrop) then
                 f = f + 1
                 this_filter(nc)%hydrologyc(f) = c
@@ -422,7 +423,7 @@ contains
           if (veg_pp%active(p) .or. include_inactive) then
              if (veg_pp%itype(p) < npcropmin) then
                 l =veg_pp%landunit(p)
-                if (lun_pp%itype(l) == istsoil .or. lun_pp%itype(l) == istcrop) then
+                if (( lun_pp%itype(l) == istsoil .or. lun_pp%itype(l) == istwet ) .or. lun_pp%itype(l) == istcrop) then
                    fnc = fnc + 1
                    this_filter(nc)%soilnopcropp(fnc) = p
                 end if
@@ -530,7 +531,7 @@ contains
              l = col_pp%landunit(c)
              g = col_pp%gridcell(c)
              if ( lun_pp%itype(l) == istice_mec .or. &
-                (lun_pp%itype(l) == istsoil .and. icemask_grc(g) > 0.)) then
+                (( lun_pp%itype(l) == istsoil .or. lun_pp%itype(l) == istwet ) .and. icemask_grc(g) > 0.)) then
                 f = f + 1
                 this_filter(nc)%do_smb_c(f) = c
              end if

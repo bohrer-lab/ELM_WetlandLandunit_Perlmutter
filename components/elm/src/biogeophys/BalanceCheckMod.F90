@@ -167,7 +167,8 @@ contains
      use elm_varcon        , only : spval
      use column_varcon     , only : icol_roof, icol_sunwall, icol_shadewall
      use column_varcon     , only : icol_road_perv, icol_road_imperv
-     use landunit_varcon   , only : istice_mec, istdlak, istsoil,istcrop,istwet
+     use landunit_varcon   , only : istwet
+  use landunit_varcon   , only : istice_mec, istdlak, istsoil,istcrop,istwet
      use elm_varctl        , only : create_glacier_mec_landunit
      use elm_initializeMod , only : surfalb_vars  
      use CanopyStateType   , only : canopystate_type
@@ -472,7 +473,7 @@ contains
                    endif
                 endif
 
-                if (lun_pp%itype(l) == istsoil .or. lun_pp%itype(l) == istcrop .or. lun_pp%itype(l) == istwet ) then
+                if (( lun_pp%itype(l) == istsoil .or. lun_pp%itype(l) == istwet ) .or. lun_pp%itype(l) == istcrop .or. lun_pp%itype(l) == istwet ) then
                    if (.not. use_extrasnowlayers) then
                       if (do_capsnow(c)) then
                          snow_sources(c) = frac_sno_eff(c) * (qflx_dew_snow(c) + qflx_dew_grnd(c) ) &
@@ -896,7 +897,8 @@ contains
      use elm_varcon        , only : spval
      use column_varcon     , only : icol_roof, icol_sunwall, icol_shadewall
      use column_varcon     , only : icol_road_perv, icol_road_imperv
-     use landunit_varcon   , only : istice_mec, istdlak, istsoil,istcrop,istwet
+     use landunit_varcon   , only : istwet
+  use landunit_varcon   , only : istice_mec, istdlak, istsoil,istcrop,istwet
      use elm_varctl        , only : create_glacier_mec_landunit
      use elm_initializeMod , only : surfalb_vars
      use CanopyStateType   , only : canopystate_type

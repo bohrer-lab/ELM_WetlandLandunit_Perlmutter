@@ -23,6 +23,7 @@ module lnd2glcMod
   use elm_varctl      , only : iulog
   use elm_varcon      , only : spval, tfrz, namec
   use column_varcon   , only : col_itype_to_icemec_class
+  use landunit_varcon   , only : istwet
   use landunit_varcon , only : istice_mec, istsoil
   use abortutils      , only : endrun
   use LandunitType    , only : lun_pp                
@@ -182,7 +183,7 @@ contains
       if (lun_pp%itype(l) == istice_mec) then
          n = col_itype_to_icemec_class(col_pp%itype(c))
          flux_normalization = 1.0_r8
-      else if (lun_pp%itype(l) == istsoil) then
+      else if (( lun_pp%itype(l) == istsoil .or. lun_pp%itype(l) == istwet )) then
          n = 0  !0-level index (bareland information)
          flux_normalization = bareland_normalization(c)
       else

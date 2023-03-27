@@ -325,16 +325,16 @@ CONTAINS
 
             index_season = -1
 
-            if ( lun_pp%itype(l) /= istsoil )then
+            if ( lun_pp%itype(l) /= istsoil .and. lun_pp%itype(l) /= istwet )then
                if ( lun_pp%itype(l) == istice .or. lun_pp%itype(l) == istice_mec ) then
                   wesveg       = 8
                   index_season = 4
                elseif ( lun_pp%itype(l) == istdlak ) then
                   wesveg       = 7
                   index_season = 4
-               elseif ( lun_pp%itype(l) == istwet ) then
-                  wesveg       = 9
-                  index_season = 2
+               !elseif ( lun_pp%itype(l) == istwet ) then
+                  !wesveg       = 9
+                  !index_season = 2
                elseif ( lun_pp%urbpoi(l) ) then
                   wesveg       = 1
                   index_season = 2

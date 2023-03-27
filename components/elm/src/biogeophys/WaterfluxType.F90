@@ -346,7 +346,10 @@ contains
   subroutine InitCold(this, bounds)
     !
     ! !USES:
-    use landunit_varcon, only : istsoil, istcrop
+    use landunit_varcon   , only : istwet
+  use landunit_varcon   , only : istwet
+  use landunit_varcon   , only : istwet
+  use landunit_varcon, only : istsoil, istcrop
     !
     ! !ARGUMENTS:
     class(waterflux_type) :: this
@@ -373,7 +376,7 @@ contains
     ! needed for NitrogenLeaching 
     do c = bounds%begc, bounds%endc
        l = col_pp%landunit(c)
-       if (lun_pp%itype(l) == istsoil .or. lun_pp%itype(l) == istcrop) then
+       if (( lun_pp%itype(l) == istsoil .or. lun_pp%itype(l) == istwet ) .or. lun_pp%itype(l) == istcrop) then
           this%qflx_drain_col(c) = 0._r8
           this%qflx_surf_col(c)  = 0._r8
           this%qflx_irr_demand_col(c)  = 0._r8
@@ -383,7 +386,7 @@ contains
     do p = bounds%begp, bounds%endp
        l = veg_pp%landunit(p)
        
-       if (lun_pp%itype(l)==istsoil) then
+       if (( lun_pp%itype(l)==istsoil .or. lun_pp%itype(l)==istwet )) then
           this%n_irrig_steps_left_patch(p) = 0
           this%irrig_rate_patch(p)         = 0.0_r8
        end if
@@ -397,7 +400,10 @@ contains
     ! !USES:
     use spmdMod          , only : masterproc
     use elm_varcon       , only : denice, denh2o, pondmx, watmin
-    use landunit_varcon  , only : istcrop, istdlak, istsoil 
+    use landunit_varcon   , only : istwet
+  use landunit_varcon   , only : istwet
+  use landunit_varcon   , only : istwet
+  use landunit_varcon  , only : istcrop, istdlak, istsoil 
     use column_varcon    , only : icol_roof, icol_sunwall, icol_shadewall
     use elm_varpar       , only : nlevgrnd, nlevurb, nlevsno   
     use ncdio_pio        , only : file_desc_t, ncd_io, ncd_double, ncd_int, ncd_inqvdlen

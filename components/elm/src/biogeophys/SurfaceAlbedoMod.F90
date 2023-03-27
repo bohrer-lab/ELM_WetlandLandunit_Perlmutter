@@ -11,6 +11,9 @@ module SurfaceAlbedoMod
   use shr_log_mod       , only : errMsg => shr_log_errMsg
   use abortutils        , only : endrun
   use decompMod         , only : bounds_type
+  use landunit_varcon   , only : istwet
+  use landunit_varcon   , only : istwet
+  use landunit_varcon   , only : istwet
   use landunit_varcon   , only : istsoil, istcrop, istdlak
   use elm_varcon        , only : grlnd, namep, namet
   use elm_varpar        , only : numrad, nlevcan, nlevsno, nlevcan
@@ -733,7 +736,7 @@ contains
     do fp = 1,num_nourbanp
        p = filter_nourbanp(fp)
           if (coszen_patch(p) > 0._r8) then
-             if ((lun_pp%itype(veg_pp%landunit(p)) == istsoil .or.  &
+             if ((( lun_pp%itype(veg_pp%landunit(p)) == istsoil .or. lun_pp%itype(veg_pp%landunit(p)) == istwet ) .or.  &
                   lun_pp%itype(veg_pp%landunit(p)) == istcrop     ) &
                  .and. (elai(p) + esai(p)) > 0._r8) then
                     num_vegsol = num_vegsol + 1
@@ -996,7 +999,10 @@ contains
       !$acc routine seq
     use elm_varpar, only : numrad
     use elm_varcon      , only : tfrz
-    use landunit_varcon, only : istice, istice_mec, istdlak
+    use landunit_varcon   , only : istwet
+  use landunit_varcon   , only : istwet
+  use landunit_varcon   , only : istwet
+  use landunit_varcon, only : istice, istice_mec, istdlak
     use LakeCon         , only : lakepuddling
     use domainMod       , only : ldomain
     !
@@ -1050,7 +1056,7 @@ contains
           pi = ldomain%pftm(g)
           if (coszen(c) > 0._r8) then
              l = col_pp%landunit(c)
-             if (lun_pp%itype(l) == istsoil .or. lun_pp%itype(l) == istcrop .and. top_pp%active(t))  then ! soil
+             if (( lun_pp%itype(l) == istsoil .or. lun_pp%itype(l) == istwet ) .or. lun_pp%itype(l) == istcrop .and. top_pp%active(t))  then ! soil
                 inc    = max(0.11_r8-0.40_r8*h2osoi_vol(c,1), 0._r8)
                 soilcol = isoicol(c)
                 ! changed from local variable to elm_type:

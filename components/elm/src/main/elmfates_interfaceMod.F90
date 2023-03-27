@@ -104,7 +104,8 @@ module ELMFatesInterfaceMod
    use VegetationDataType, only : veg_es, veg_wf, veg_ws
    use LandunitType      , only : lun_pp
 
-   use landunit_varcon   , only : istsoil
+   use landunit_varcon   , only : istwet
+  use landunit_varcon   , only : istsoil
    use abortutils        , only : endrun
    use shr_log_mod       , only : errMsg => shr_log_errMsg
    use elm_varcon        , only : dzsoi_decomp
@@ -632,7 +633,7 @@ contains
             ! INTERF-TODO: WE HAVE NOT FILTERED OUT FATES SITES ON INACTIVE COLUMNS.. YET
             ! NEED A RUN-TIME ROUTINE THAT CLEARS AND REWRITES THE SITE LIST
 
-            if ( (lun_pp%itype(l) == istsoil) .and. (col_pp%active(c)) ) then
+            if ( (( lun_pp%itype(l) == istsoil .or. lun_pp%itype(l) == istwet )) .and. (col_pp%active(c)) ) then
                s = s + 1
                collist(s) = c
                this%f2hmap(nc)%hsites(c) = s
@@ -2716,7 +2717,7 @@ end subroutine wrap_update_hifrq_hist
     num_filter_hydroc = 0
     do s = 1,num_filterc
        l = col_pp%landunit(filterc(s))
-       if (lun_pp%itype(l) == istsoil ) then
+       if (( lun_pp%itype(l) == istsoil .or. lun_pp%itype(l) == istwet ) ) then
           num_filter_hydroc = num_filter_hydroc + 1
        end if
     end do

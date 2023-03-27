@@ -132,7 +132,10 @@ contains
     ! !USES:
       !$acc routine seq
     use elm_varcon        , only : denh2o, denice, wimp, ssi
-    use landunit_varcon   , only : istsoil
+    use landunit_varcon   , only : istwet
+  use landunit_varcon   , only : istwet
+  use landunit_varcon   , only : istwet
+  use landunit_varcon   , only : istsoil
     use AerosolMod        , only : AerosolFluxes
     use elm_varctl        , only : use_vsfm
     !
@@ -556,7 +559,10 @@ contains
      ! !USES:
       !$acc routine seq
      use elm_varcon      , only : denice, denh2o, tfrz, rpi, grav, rgas
-     use landunit_varcon , only : istice_mec, istdlak, istsoil, istcrop
+     use landunit_varcon   , only : istwet
+  use landunit_varcon   , only : istwet
+  use landunit_varcon   , only : istwet
+  use landunit_varcon , only : istice_mec, istdlak, istsoil, istcrop
      use elm_varctl      , only : subgridflag
      !
      ! !ARGUMENTS:
@@ -705,7 +711,7 @@ contains
                    ! Compaction occurring during melt
 
                    if (imelt(c,j) == 1) then
-                      if(subgridflag==1 .and. (ltype(col_pp%landunit(c)) == istsoil .or. ltype(col_pp%landunit(c)) == istcrop)) then
+                      if(subgridflag==1 .and. (( ltype(col_pp%landunit(c)) == istsoil .or. ltype(col_pp%landunit(c)) == istwet ) .or. ltype(col_pp%landunit(c)) == istcrop)) then
                          ! first term is delta mass over mass
                          ddz3 = max(0._r8,min(1._r8,(swe_old(c,j) - wx)/wx))
 
@@ -778,7 +784,10 @@ contains
      !
      ! !USES:
       !$acc routine seq
-     use landunit_varcon  , only : istsoil, istdlak, istsoil, istwet, istice, istice_mec, istcrop
+     use landunit_varcon   , only : istwet
+  use landunit_varcon   , only : istwet
+  use landunit_varcon   , only : istwet
+  use landunit_varcon  , only : istsoil, istdlak, istsoil, istwet, istice, istice_mec, istcrop
      use LakeCon          , only : lsadz
      use elm_varcon       , only : denh2o
      !
@@ -884,7 +893,7 @@ contains
           do j = msn_old(c)+1,0
              ! use 0.01 to avoid runaway ice buildup
              if (h2osoi_ice(c,j) <= .01_r8) then
-                if (ltype(l) == istsoil .or. urbpoi(l) .or. ltype(l) == istcrop) then
+                if (( ltype(l) == istsoil .or. ltype(l) == istwet ) .or. urbpoi(l) .or. ltype(l) == istcrop) then
                    h2osoi_liq(c,j+1) = h2osoi_liq(c,j+1) + h2osoi_liq(c,j)
                    h2osoi_ice(c,j+1) = h2osoi_ice(c,j+1) + h2osoi_ice(c,j)
 
@@ -911,7 +920,7 @@ contains
                       mss_dst4(c,j+1)  = mss_dst4(c,j+1)   + mss_dst4(c,j)
                    end if
 
-                else if (ltype(l) /= istsoil .and. .not. urbpoi(l) .and. ltype(l) /= istcrop .and. j /= 0) then
+                else if ((ltype(l) /= istsoil .and. ltype(l) /= istwet) .and. .not. urbpoi(l) .and. ltype(l) /= istcrop .and. j /= 0) then
 
                    h2osoi_liq(c,j+1) = h2osoi_liq(c,j+1) + h2osoi_liq(c,j)
                    h2osoi_ice(c,j+1) = h2osoi_ice(c,j+1) + h2osoi_ice(c,j)
@@ -935,7 +944,7 @@ contains
                       ! urban, soil or crop, the h2osoi_liq and h2osoi_ice associated with this layer is sent
                       ! to qflx_qrgwl later on in the code.  To keep track of this for the snow balance
                       ! error check, we add this to qflx_sl_top_soil here
-                      if (ltype(l) /= istsoil .and. ltype(l) /= istcrop .and. .not. urbpoi(l) .and. i == 0) then
+                      if ((ltype(l) /= istsoil .and. ltype(l) /= istwet) .and. ltype(l) /= istcrop .and. .not. urbpoi(l) .and. i == 0) then
                          qflx_sl_top_soil(c) = (h2osoi_liq(c,i) + h2osoi_ice(c,i))/dtime
                       end if
 
@@ -1005,15 +1014,15 @@ contains
 
                 if (h2osno(c) <= 0._r8) snow_depth(c) = 0._r8
                 ! this is where water is transfered from layer 0 (snow) to layer 1 (soil)
-                if (ltype(l) == istsoil .or. urbpoi(l) .or. ltype(l) == istcrop) then
+                if (( ltype(l) == istsoil .or. ltype(l) == istwet ) .or. urbpoi(l) .or. ltype(l) == istcrop) then
                    h2osoi_liq(c,0) = 0.0_r8
                    h2osoi_liq(c,1) = h2osoi_liq(c,1) + zwliq(c)
                    qflx_snow2topsoi(c) = zwliq(c)/dtime
                    mflx_snowlyr_col(c) = mflx_snowlyr_col(c) + zwliq(c)/dtime
                 end if
-                if (ltype(l) == istwet) then
-                   h2osoi_liq(c,0) = 0.0_r8
-                endif
+                !if (ltype(l) == istwet) then
+                   !h2osoi_liq(c,0) = 0.0_r8
+                !endif
                 if (ltype(l) == istice .or. ltype(l)==istice_mec) then
                    h2osoi_liq(c,0) = 0.0_r8
                 endif

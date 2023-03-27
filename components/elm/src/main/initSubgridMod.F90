@@ -195,7 +195,10 @@ contains
     !
     ! !USES
     use elm_varcon, only : ispval
-    use landunit_varcon, only : max_lunit
+    use landunit_varcon   , only : istwet
+  use landunit_varcon   , only : istwet
+  use landunit_varcon   , only : istwet
+  use landunit_varcon, only : max_lunit
     use topounit_varcon, only : max_topounits
     !
     ! !ARGUMENTS
@@ -429,7 +432,10 @@ contains
     ! accordingly.
     !
     ! !USES:
-    use landunit_varcon , only : istsoil, istcrop, istice_mec, istdlak, isturb_MIN, isturb_MAX
+    use landunit_varcon   , only : istwet
+  use landunit_varcon   , only : istwet
+  use landunit_varcon   , only : istwet
+  use landunit_varcon , only : istsoil, istcrop, istice_mec, istdlak, isturb_MIN, isturb_MAX
     !
     ! !ARGUMENTS:
     integer  , intent(inout) :: li         ! input value is index of last landunit added; output value is index of this newly-added landunit
@@ -450,7 +456,7 @@ contains
     lun_pp%wttopounit(li) = wttopounit
     lun_pp%itype(li) = ltype
     
-    if (ltype == istsoil .or. ltype == istcrop) then
+    if (( ltype == istsoil .or. ltype == istwet ) .or. ltype == istcrop) then
        lun_pp%ifspecial(li) = .false.
     else
        lun_pp%ifspecial(li) = .true.
@@ -514,7 +520,10 @@ contains
     !
     ! !USES:
     use elm_varcon      , only : ispval
-    use landunit_varcon , only : istsoil, istcrop
+    use landunit_varcon   , only : istwet
+  use landunit_varcon   , only : istwet
+  use landunit_varcon   , only : istwet
+  use landunit_varcon , only : istsoil, istcrop
     use elm_varpar      , only : natpft_lb
     !
     ! !ARGUMENTS:
@@ -541,7 +550,7 @@ contains
     veg_pp%itype(pi) = ptype
 
     li = veg_pp%landunit(pi)
-    if (lun_pp%itype(li) == istsoil .or. lun_pp%itype(li) == istcrop) then
+    if (( lun_pp%itype(li) == istsoil .or. lun_pp%itype(li) == istwet ) .or. lun_pp%itype(li) == istcrop) then
        lb_offset = 1 - natpft_lb
        veg_pp%mxy(pi) = ptype + lb_offset
     else

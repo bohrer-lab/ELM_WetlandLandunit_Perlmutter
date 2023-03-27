@@ -100,6 +100,7 @@ module subgridWeightsMod
   use LandunitType , only : lun_pp                
   use ColumnType   , only : col_pp                
   use VegetationType    , only : veg_pp                
+  use landunit_varcon   , only : istwet
   use landunit_varcon, only : istsoil, istice, istice_mec
   use topounit_varcon , only : max_topounits, has_topounit
   !
@@ -153,7 +154,8 @@ contains
     ! Initialize stuff in this module
     !
     ! !USES:
-    use landunit_varcon, only : max_lunit
+    use landunit_varcon   , only : istwet
+  use landunit_varcon, only : max_lunit
     use elm_varpar     , only : maxpatch_glcmec, natpft_size, cft_size
     use shr_infnan_mod , only : nan => shr_infnan_nan, assignment(=)
     use decompMod      , only : BOUNDS_LEVEL_PROC
@@ -280,7 +282,7 @@ contains
     do l = bounds%begl,bounds%endl
        t = lun_pp%topounit(l)
        lun_pp%active(l) = is_active_l(l)
-       if (lun_pp%active(l) .and. .not. lun_pp%itype(l) == istice_mec .and. .not. lun_pp%itype(l) == istsoil .and. .not. top_pp%active(t)) then
+       if (lun_pp%active(l) .and. .not. lun_pp%itype(l) == istice_mec .and. .not. ( lun_pp%itype(l) == istsoil .or. lun_pp%itype(l) == istwet ) .and. .not. top_pp%active(t)) then
           write(iulog,*) trim(subname),' ERROR: active landunit found on inactive topounit', &
                          'at l = ', l, ', t = ', t
           call endrun(decomp_index=l, elmlevel=namel, msg=errMsg(__FILE__, __LINE__))
@@ -316,7 +318,8 @@ contains
     ! Determine whether the given landunit is active
     !
     ! !USES:
-    use landunit_varcon, only : istsoil, istice, istice_mec
+    use landunit_varcon   , only : istwet
+  use landunit_varcon, only : istsoil, istice, istice_mec
     use domainMod , only : ldomain
     !
     ! !ARGUMENTS:
@@ -376,8 +379,8 @@ contains
        ! - in this topounit, due to dynamic landunits. We'll live with the fact that
        ! initialization of the new crop landunit will be initialized in an un-ideal way
        ! in this rare situation.
-       !if (lun_pp%itype(l) == istsoil .and. .not. is_topo_all_ltypeX(t, istice)) then ! make sure no active l for inactive topounit TKT
-       if (top_pp%active(t) .and. lun_pp%itype(l) == istsoil .and. .not. is_topo_all_ltypeX(t, istice)) then
+       !if (( lun_pp%itype(l) == istsoil .or. lun_pp%itype(l) == istwet ) .and. .not. is_topo_all_ltypeX(t, istice)) then ! make sure no active l for inactive topounit TKT
+       if (top_pp%active(t) .and. ( lun_pp%itype(l) == istsoil .or. lun_pp%itype(l) == istwet ) .and. .not. is_topo_all_ltypeX(t, istice)) then
           is_active_l = .true.
        end if
 
@@ -392,7 +395,8 @@ contains
     ! Determine whether the given column is active
     !
     ! !USES:
-    use landunit_varcon, only : istice_mec, isturb_MIN, isturb_MAX
+    use landunit_varcon   , only : istwet
+  use landunit_varcon, only : istice_mec, isturb_MIN, isturb_MAX
     use domainMod , only : ldomain
     !
     ! !ARGUMENTS:
@@ -890,7 +894,8 @@ contains
     ! that has a 0-weight (i.e., virtual) glc_mec landunit.
     !
     ! !USES:
-    use landunit_varcon, only : istice_mec
+    use landunit_varcon   , only : istwet
+  use landunit_varcon, only : istice_mec
     use column_varcon, only : col_itype_to_icemec_class
     use elm_varpar, only : maxpatch_glcmec
     !
@@ -929,7 +934,8 @@ contains
     ! Set pct_nat_pft & pct_cft diagnostic fields: % of PFTs on their landunit
     !
     ! !USES:
-    use landunit_varcon, only : istsoil, istcrop
+    use landunit_varcon   , only : istwet
+  use landunit_varcon, only : istsoil, istcrop
     use elm_varpar, only : natpft_lb, cft_lb
     !
     ! !ARGUMENTS:
@@ -958,7 +964,7 @@ contains
        !topi = grc_pp%topi(g)
        !ti = t - topi + 1
        ptype = veg_pp%itype(p)
-       if (lun_pp%itype(l) == istsoil) then
+       if (( lun_pp%itype(l) == istsoil .or. lun_pp%itype(l) == istwet )) then
           ptype_1indexing = ptype + (1 - natpft_lb)
           subgrid_weights_diagnostics%pct_nat_pft(t, ptype_1indexing) = veg_pp%wtlunit(p) * 100._r8
        else if (lun_pp%itype(l) == istcrop) then

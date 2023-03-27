@@ -47,7 +47,8 @@ module elm_interface_pflotranMod
   use shr_log_mod  , only : errMsg => shr_log_errMsg
 
   ! currently only works with soil columns, i.e. luntype of 'istsoil/istcrop'
-  !  use landunit_varcon     , only : istsoil, istcrop
+  !  use landunit_varcon   , only : istwet
+  use landunit_varcon     , only : istsoil, istcrop
 
   ! (dummy) variable definitions
   ! ALM types/variables are replaced by elm_interface_data
@@ -375,7 +376,8 @@ contains
     use GridcellType    , only : grc_pp
     use LandunitType    , only : lun_pp
     use ColumnType      , only : col_pp
-    use landunit_varcon , only : istsoil, istcrop
+    use landunit_varcon   , only : istwet
+  use landunit_varcon , only : istsoil, istcrop
     use decompMod       , only : get_proc_global, get_proc_clumps, ldecomp
     use spmdMod         , only : mpicom, masterproc, iam, npes
     use domainMod       , only : ldomain, lon1d, lat1d
@@ -484,7 +486,7 @@ contains
             !write (iulog,*) 'WARNING: SOIL/CROP column with wtgcell <= 0 or inactive... within the domain'
             !write (iulog,*) 'ELM-- PFLOTRAN does not include such a SOIL/CROP column, AND will skip it'
 
-         elseif ( .not.(ltype(l)==istsoil .or. ltype(l)==istcrop) ) then
+         elseif ( .not.(( ltype(l)==istsoil .or. ltype(l)==istwet ) .or. ltype(l)==istcrop) ) then
             !write (iulog,*) 'WARNING: non-SOIL/CROP column found in filter%num_soilc: nc, l, ltype', nc, l, ltype(l)
             !write (iulog,*) 'ELM-- PFLOTRAN does not include such a SOIL/CROP column, AND will skip it'
 
@@ -548,7 +550,7 @@ contains
       g = cgridcell(c)
 
       gcount = g - bounds%begg + 1
-      if ((.not.(ltype(l)==istsoil)) .and. (.not.(ltype(l)==istcrop)) ) then
+      if ((.not.(( ltype(l)==istsoil .or. ltype(l)==istwet ))) .and. (.not.(ltype(l)==istcrop)) ) then
          !write (iulog,*) 'WARNING: Land Unit type of Non-SOIL/CROP... within the domain'
          !write (iulog,*) 'ELM-- PFLOTRAN does not support this land unit at present, AND will skip it'
 
@@ -598,7 +600,7 @@ contains
       g = cgridcell(c)
       gcount = g-bounds%begg+1
 
-      if( (ltype(l)==istsoil .or. ltype(l)==istcrop) .and. &
+      if( (( ltype(l)==istsoil .or. ltype(l)==istwet ) .or. ltype(l)==istcrop) .and. &
           (cactive(c) .and. cwtgcell(c)>0._r8) ) then
          mapped_gid(gcount) = grc_pp%gindex(g)      ! this is the globally grid-index, i.e. 'an' in its original calculation
 
@@ -1320,7 +1322,8 @@ contains
 
     use elm_varpar      , only : nlevgrnd
     use domainMod       , only : ldomain
-    use landunit_varcon , only : istsoil, istcrop
+    use landunit_varcon   , only : istwet
+  use landunit_varcon , only : istsoil, istcrop
     use elm_varcon      , only : re
 
 
@@ -1660,7 +1663,8 @@ contains
     ! !USES:
     use LandunitType            , only : lun_pp
     use ColumnType              , only : col_pp
-    use landunit_varcon         , only : istsoil, istcrop
+    use landunit_varcon   , only : istwet
+  use landunit_varcon         , only : istsoil, istcrop
 
     use elm_varpar              , only : nlevgrnd, ndecomp_pools, ndecomp_cascade_transitions
     use CNDecompCascadeConType  , only : decomp_cascade_con
@@ -1856,7 +1860,7 @@ contains
       g = cgridcell(c)
       l = clandunit(c)
 
-      if ( (ltype(l)==istsoil .or. ltype(l)==istcrop) .and. &
+      if ( (( ltype(l)==istsoil .or. ltype(l)==istwet ) .or. ltype(l)==istcrop) .and. &
            (cactive(c) .and. cwtgcell(c)>0._r8) ) then        ! skip inactive or zero-weighted column (may be not needed, but in case)
 
 #ifdef COLUMN_MODE
@@ -3519,7 +3523,8 @@ contains
     use ColumnType          , only : col_pp
     use elm_varpar          , only : nlevgrnd
     use elm_varcon          , only : tfrz, denh2o
-    use landunit_varcon     , only : istsoil, istcrop
+    use landunit_varcon   , only : istwet
+  use landunit_varcon     , only : istsoil, istcrop
     use clm_time_manager    , only : get_step_size, get_nstep
 
     !
