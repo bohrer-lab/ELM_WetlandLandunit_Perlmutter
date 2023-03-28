@@ -757,6 +757,10 @@ contains
                 end if
                 this%hksat_col(c,lev)  = uncon_frac*uncon_hksat + (perc_frac*om_frac)*om_hksat
 
+                if ((lun_pp%itype(l) == istwet) .and. (lev == nlevbed .or. lev == nlevbed-1)) then
+                   this%hksat_col(c,lev) = 0.0
+                endif
+
                 this%tkmg_col(c,lev)   = tkm ** (1._r8- this%watsat_col(c,lev))
 
                 this%tksatu_col(c,lev) = this%tkmg_col(c,lev)*0.57_r8**this%watsat_col(c,lev)
