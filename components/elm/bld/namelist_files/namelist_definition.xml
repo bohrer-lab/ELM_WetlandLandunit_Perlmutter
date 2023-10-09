@@ -1522,6 +1522,14 @@ If TRUE, weight btran (vegetation soil moisture availability) by the active laye
 (EXPERIMENTAL and NOT tested)
 </entry>
 
+<!-- ========================================================================================  -->
+<!-- namelist elements associated with the wetland landunit                                     -->
+<!-- ========================================================================================  -->
+
+<entry id="read_wetl_surf_wat_elev_from_surf" type="logical" category="physics"
+       group="elm_inparm" valid_values="" >
+Read wetland surface water elevation from input surface file
+</entry>
 
 <!-- ========================================================================================  -->
 <!-- namelist elements associated with the LISSS Lake Model                                    -->

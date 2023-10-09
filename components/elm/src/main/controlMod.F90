@@ -264,6 +264,8 @@ contains
 
     namelist /elm_inparm / use_lai_streams
 
+    namelist /elm_inparm / read_wetl_surf_wat_elev_from_surf
+
     namelist /elm_inparm/  &
          use_c14_bombspike, atm_c14_filename
 
@@ -782,6 +784,8 @@ contains
     call mpi_bcast (use_betr, 1, MPI_LOGICAL, 0, mpicom, ier)
 
     call mpi_bcast (use_lai_streams, 1, MPI_LOGICAL, 0, mpicom, ier)
+
+    call mpi_bcast (read_wetl_surf_wat_elev_from_surf, 1, MPI_LOGICAL, 0, mpicom, ier)
 
     call mpi_bcast (use_dynroot, 1, MPI_LOGICAL, 0, mpicom, ier)
 

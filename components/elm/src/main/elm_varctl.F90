@@ -248,6 +248,13 @@ module elm_varctl
   !----------------------------------------------------------
 
   logical, public :: use_lai_streams = .false. ! true => use lai streams in SatellitePhenologyMod.F90
+
+  !----------------------------------------------------------
+  ! Read wetland surface water elevation from input surface file
+  !----------------------------------------------------------
+
+  logical, public :: read_wetl_surf_wat_elev_from_surf = .false. ! true => Read wetland surface water elevation from input surface file
+  
   !----------------------------------------------------------
   ! plant hydraulic stress switch
   !----------------------------------------------------------
