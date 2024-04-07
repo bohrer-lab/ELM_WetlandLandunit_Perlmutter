@@ -1443,7 +1443,7 @@ contains
                          else
                             
                             if (lun_pp%itype(col_pp%landunit(c)) == istwet .and. read_wetl_surf_wat_elev_from_surf ) then
-                               zwt(c) = (-h2osfc_wet(c) + 600)*0.001
+                               zwt(c) = -(h2osfc_wet(c) + CH4ParamsInst%h2osfc_wet_lb)*0.001
                             else
                                zwt(c) = zi(c,j)
                             endif
