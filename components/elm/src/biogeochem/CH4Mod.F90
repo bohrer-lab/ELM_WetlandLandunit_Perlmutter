@@ -78,6 +78,12 @@ module CH4Mod
      real(r8), pointer :: pHmin             => null()    ! minimum pH for methane production(= 2.2_r8)
      real(r8), pointer :: oxinhib           => null()    ! inhibition of methane production by oxygen (m^3/mol)
 
+     real(r8), pointer :: f_ch4_1           => null()    ! ratio of CH4 production to total C mineralization - First Wetland Vegetation
+     real(r8), pointer :: f_ch4_2           => null()    ! ratio of CH4 production to total C mineralization - Second Wetland Vegetation
+
+     real(r8), pointer :: h2osfc_wet_lb           => null()    ! Wetland Surface Water Elevation Lower Bound
+     real(r8), pointer :: h2osfc_max           => null()    ! Maximum Surface Water Depth (used in SoilHydrologuMod subroutine)
+
      ! ch4 oxidation constants
      real(r8), pointer :: vmax_ch4_oxid     => null()     ! oxidation rate constant (= 45.e-6_r8 * 1000._r8 / 3600._r8) [mol/m3-w/s];
      real(r8), pointer :: k_m               => null()     ! Michaelis-Menten oxidation rate constant for CH4 concentration
@@ -112,6 +118,8 @@ module CH4Mod
      real(r8), pointer :: q10lakebase  => null()         ! (K) base temperature for lake CH4 production (= 298._r8)
      real(r8), pointer :: atmch4       => null()         ! Atmospheric CH4 mixing ratio to prescribe if not provided by the atmospheric model (= 1.7e-6_r8) (mol/mol)
      real(r8), pointer :: rob          => null()         ! ratio of root length to vertical depth ("root obliquity") (= 3._r8)
+     real(r8), pointer :: MeasAereResis_1 => null()         ! measured aerenchyma resistance (s/m) - Second First Veg
+     real(r8), pointer :: MeasAereResis_2 => null()         ! measured aerenchyma resistance (s/m) - Second Wetland Veg
   end type CH4ParamsType
   type(CH4ParamsType), public ::  CH4ParamsInst
   !$acc declare create(CH4ParamsInst)
@@ -1078,6 +1086,10 @@ contains
     allocate(CH4ParamsInst%q10ch4           )
     allocate(CH4ParamsInst%q10ch4base       )
     allocate(CH4ParamsInst%f_ch4            )
+    allocate(CH4ParamsInst%f_ch4_1          )
+    allocate(CH4ParamsInst%f_ch4_2          )
+    allocate(CH4ParamsInst%h2osfc_wet_lb          )
+    allocate(CH4ParamsInst%h2osfc_max          )
     allocate(CH4ParamsInst%rootlitfrac      )
     allocate(CH4ParamsInst%cnscalefactor    )
     allocate(CH4ParamsInst%redoxlag         )
@@ -1109,6 +1121,8 @@ contains
     allocate(CH4ParamsInst%q10lakebase         )
     allocate(CH4ParamsInst%atmch4              )
     allocate(CH4ParamsInst%rob                 )
+    allocate(CH4ParamsInst%MeasAereResis_1       )
+    allocate(CH4ParamsInst%MeasAereResis_2      )
 
 
     if ( .not. use_aereoxid_prog ) then
@@ -1135,6 +1149,26 @@ contains
      call ncd_io(trim(tString),tempr, 'read', ncid, readvar=readv)
      if ( .not. readv ) call endrun(msg=trim(errCode)//trim(tString)//errMsg(__FILE__, __LINE__))
      CH4ParamsInst%f_ch4=tempr
+
+     tString='f_ch4_1'
+     call ncd_io(trim(tString),tempr, 'read', ncid, readvar=readv)
+     if ( .not. readv ) call endrun(msg=trim(errCode)//trim(tString)//errMsg(__FILE__, __LINE__))
+     CH4ParamsInst%f_ch4_1=tempr
+
+     tString='f_ch4_2'
+     call ncd_io(trim(tString),tempr, 'read', ncid, readvar=readv)
+     if ( .not. readv ) call endrun(msg=trim(errCode)//trim(tString)//errMsg(__FILE__, __LINE__))
+     CH4ParamsInst%f_ch4_2=tempr
+
+     tString='h2osfc_wet_lb'
+     call ncd_io(trim(tString),tempr, 'read', ncid, readvar=readv)
+     if ( .not. readv ) call endrun(msg=trim(errCode)//trim(tString)//errMsg(__FILE__, __LINE__))
+     CH4ParamsInst%h2osfc_wet_lb=tempr
+
+     tString='h2osfc_max'
+     call ncd_io(trim(tString),tempr, 'read', ncid, readvar=readv)
+     if ( .not. readv ) call endrun(msg=trim(errCode)//trim(tString)//errMsg(__FILE__, __LINE__))
+     CH4ParamsInst%h2osfc_max=tempr
 
      tString='rootlitfrac'
      call ncd_io(trim(tString),tempr, 'read', ncid, readvar=readv)
@@ -1174,7 +1208,8 @@ contains
      tString='vmax_ch4_oxid'
      call ncd_io(trim(tString),tempr, 'read', ncid, readvar=readv)
      if ( .not. readv ) call endrun(msg=trim(errCode)//trim(tString)//errMsg(__FILE__, __LINE__))
-     CH4ParamsInst%vmax_ch4_oxid=45.e-6_r8 * 1000._r8 / 3600._r8
+     !CH4ParamsInst%vmax_ch4_oxid=45.e-6_r8 * 1000._r8 / 3600._r8
+     CH4ParamsInst%vmax_ch4_oxid=tempr
      ! FIX(FIX(SPM,032414),032414) can't be read off of param file.  not bfb since it is a divide
      !CH4ParamsInst%vmax_ch4_oxid=tempr
 
@@ -1298,6 +1333,16 @@ contains
      if ( .not. readv ) call endrun(msg=trim(errCode)//trim(tString)//errMsg(__FILE__, __LINE__))
      CH4ParamsInst%capthick=tempr
 
+     tString='MeasAereResis_1'
+     call ncd_io(trim(tString),tempr, 'read', ncid, readvar=readv)
+     if ( .not. readv ) call endrun(msg=trim(errCode)//trim(tString)//errMsg(__FILE__, __LINE__))
+     CH4ParamsInst%MeasAereResis_1=tempr
+
+     tString='MeasAereResis_2'
+     call ncd_io(trim(tString),tempr, 'read', ncid, readvar=readv)
+     if ( .not. readv ) call endrun(msg=trim(errCode)//trim(tString)//errMsg(__FILE__, __LINE__))
+     CH4ParamsInst%MeasAereResis_2=tempr
+
   end subroutine readCH4Params
 
   !-----------------------------------------------------------------------
@@ -1318,6 +1363,9 @@ contains
     use pftvarcon          , only : noveg
     use CH4varcon          , only : replenishlakec, allowlakeprod, ch4offline, fin_use_fsat
     use elm_varcon         , only : secspday
+    use landunit_varcon  , only : istwet
+    use elm_varctl         , only : read_wetl_surf_wat_elev_from_surf
+    
     !
     ! !ARGUMENTS:
     type(bounds_type)        , intent(in)    :: bounds
@@ -1343,7 +1391,7 @@ contains
     ! !LOCAL VARIABLES:
     integer  :: sat                                    ! 0 = unsatured, 1 = saturated
     logical  :: lake                                   ! lake or not lake
-    integer  :: j,fc,c,g,fp,p,t,pf,s                   ! indices
+    integer  :: j,fc,c,g,fp,p,t,pf,s,d,l                   ! indices
     real(r8) :: dtime_ch4                              ! ch4 model time step (sec)
     integer  :: nstep
     integer  :: jwt(bounds%begc:bounds%endc)           ! index of the soil layer right above the water table (-)
@@ -1368,9 +1416,13 @@ contains
     real(r8) :: highlatfact                            ! multiple of qflxlagd for high latitudes
     integer  :: dummyfilter(1)                         ! empty filter
     integer  :: nc                                     ! clump index
+
+    real(r8) :: sigma          ! microtopography pdf sigma in mm
+    real(r8) :: h2osfc_wet_lb                                     ! H2OSFC Lower Bound
     !-----------------------------------------------------------------------
 
     associate(                                                                 &
+         micro_sigma  => col_pp%micro_sigma  , & ! Input:  [real(r8) (:)   ] microtopography pdf sigma (m)  
          dz                   =>   col_pp%dz                                    , & ! Input:  [real(r8) (:,:) ]  layer thickness (m)  (-nlevsno+1:nlevsoi)
          zi                   =>   col_pp%zi                                    , & ! Input:  [real(r8) (:,:) ]  interface level below a "z" level (m)
          z                    =>   col_pp%z                                     , & ! Input:  [real(r8) (:,:) ]  layer depth (m) (-nlevsno+1:nlevsoi)
@@ -1388,6 +1440,7 @@ contains
          rootfr_col           =>   soilstate_vars%rootfr_col                 , & ! Output: [real(r8) (:,:) ]  fraction of roots in each soil layer  (nlevgrnd) (p2c)
 
          frac_h2osfc          =>   col_ws%frac_h2osfc           , & ! Input:  [real(r8) (:)   ]  fraction of ground covered by surface water (0 to 1)
+         h2osfc_wet               =>    col_ws%h2osfc_wet               , & ! Input: [real(r8) (:)   ]  Forced wetland surface water (mm)
          qflx_surf            =>   col_wf%qflx_surf              , & ! Input:  [real(r8) (:)   ]  surface runoff (mm H2O /s)
 
          conc_o2_sat          =>   ch4_vars%conc_o2_sat_col                  , & ! Input:  [real(r8) (:,:) ]  O2 conc  in each soil layer (mol/m3) (nlevsoi)
@@ -1445,6 +1498,7 @@ contains
       atmch4            = CH4ParamsInst%atmch4
       qflxlagd          = CH4ParamsInst%qflxlagd
       highlatfact       = CH4ParamsInst%highlatfact
+      h2osfc_wet_lb          = CH4ParamsInst%h2osfc_wet_lb
 
       dtime = dtime_mod !get_step_size()
       dtime_ch4 = dtime
@@ -1504,7 +1558,14 @@ contains
 
          !There may be ways to improve this for irrigated crop columns...
          if (fin_use_fsat) then
-            finundated(c) = frac_h2osfc(c)
+            l = col_pp%landunit(c)
+            if (lun_pp%itype(l) == istwet .and.  read_wetl_surf_wat_elev_from_surf) then
+               d = h2osfc_wet(c) + h2osfc_wet_lb
+               sigma=1.0e3 * micro_sigma(c)
+               finundated(c) = 0.5*(1.0_r8+erf(d/(sigma*sqrt(2.0))))
+            else
+               finundated(c) = frac_h2osfc(c)
+            endif
          else
             if (zwt0(c) > 0._r8) then
                if (zwt_perched(c) < z(c,nlevsoi)-1.e-5_r8 .and. zwt_perched(c) < zwt(c)) then
@@ -1624,7 +1685,7 @@ contains
       do fc = 1, num_soilc
          c = filter_soilc(fc)
          g = col_pp%gridcell(c)
-
+   
          ! using the first topounit on this gridcell for access to atmospheric forcing
          ! PET 8/10/2018 - replace this later once gas concentrations (c_atm) are also being tracked at
          ! topounit level
@@ -1965,6 +2026,8 @@ contains
     real(r8) :: q10ch4           ! additional Q10 for methane production ABOVE the soil decomposition temperature relationship
     real(r8) :: q10ch4base       ! temperature at which the effective f_ch4 actually equals the constant f_ch4
     real(r8) :: f_ch4            ! ratio of CH4 production to total C mineralization
+    real(r8) :: f_ch4_1          ! ratio of CH4 production to total C mineralization - First Wetland Vegetation
+    real(r8) :: f_ch4_2          ! ratio of CH4 production to total C mineralization - Second Wetland Vegetation
     real(r8) :: rootlitfrac      ! Fraction of soil organic matter associated with roots
     real(r8) :: cnscalefactor    ! scale factor on CN decomposition for assigning methane flux
     real(r8) :: lake_decomp_fact ! Base decomposition rate (1/s) at 25C
@@ -2001,7 +2064,7 @@ contains
          t_soisno       =>    col_es%t_soisno      , & ! Input:  [real(r8) (:,:)  ]  soil temperature (Kelvin)  (-nlevsno+1:nlevsoi)
 
          h2osoi_vol     =>    col_ws%h2osoi_vol     , & ! Input:  [real(r8) (:,:)  ]  volumetric soil water (0<=h2osoi_vol<=watsat) [m3/m3]
-
+         
          rr             =>    veg_cf%rr           , & ! Input:  [real(r8) (:)    ]  (gC/m2/s) root respiration (fine root MR + total root GR)
          somhr          =>    col_cf%somhr          , & ! Input:  [real(r8) (:)    ]  (gC/m2/s) soil organic matter heterotrophic respiration
          lithr          =>    col_cf%lithr          , & ! Input:  [real(r8) (:)    ]  (gC/m2/s) litter heterotrophic respiration
@@ -2040,6 +2103,8 @@ contains
       q10ch4           = CH4ParamsInst%q10ch4
       q10ch4base       = CH4ParamsInst%q10ch4base
       f_ch4            = CH4ParamsInst%f_ch4
+      f_ch4_1          = CH4ParamsInst%f_ch4_1
+      f_ch4_2          = CH4ParamsInst%f_ch4_2
       rootlitfrac      = CH4ParamsInst%rootlitfrac
       cnscalefactor    = CH4ParamsInst%cnscalefactor
       lake_decomp_fact = CH4ParamsInst%lake_decomp_fact
@@ -2166,6 +2231,12 @@ contains
                ! Adjust f_ch4 by the ratio
                f_ch4_adj = f_ch4 * t_fact_ch4
 
+               if (c == 17) then
+                  f_ch4_adj = f_ch4_1 * t_fact_ch4
+               elseif (c == 18) then
+                  f_ch4_adj = f_ch4_2 * t_fact_ch4
+               endif
+               
                ! Remove CN nitrogen limitation, as methanogenesis is not N limited.
                ! Also remove (low) moisture limitation
                if (ch4rmcnlim) then
@@ -2206,6 +2277,8 @@ contains
             end if
             ! Alternative electron acceptors will be consumed first after soil is inundated.
 
+            
+            
             f_ch4_adj = min(f_ch4_adj, 0.5_r8)
             ! Must be less than 0.5 because otherwise the actual implied aerobic respiration would be negative.
             ! The total of aer. respiration + methanogenesis must remain equal to the SOMHR calculated in CN,
@@ -2369,7 +2442,8 @@ contains
                vmax_eff = vmax_ch4_oxid
             else
                k_m_eff = k_m_unsat
-               vmax_eff = vmax_oxid_unsat
+               !vmax_eff = vmax_oxid_unsat
+               vmax_eff = vmax_ch4_oxid*0.1
             end if
 
             porevol = max(watsat(c,j) - h2osoi_vol(c,j), 0._r8)
@@ -2606,7 +2680,7 @@ contains
                  annsum_npp_ptr, annavg_agnpp_ptr, annavg_bgnpp_ptr, &
                  elai(p), frootc_ptr, poros_tiller, rootfr_vr(1:nlevsoi), &
                  grnd_ch4_cond(p), conc_o2(c,1:nlevsoi), c_atm(g,1:2), &
-                 z(c,1:nlevsoi), dz(c,1:nlevsoi), sat, & 
+                 z(c,1:nlevsoi), dz(c,1:nlevsoi), sat, CH4ParamsInst%MeasAereResis_1,CH4ParamsInst%MeasAereResis_2,c,& 
                  tranloss(1:nlevsoi), &    ! Out
                  aere(1:nlevsoi), &         ! Out
                  oxaere(1:nlevsoi))         ! Out
@@ -2651,6 +2725,9 @@ contains
                     z,                &
                     dz,               &
                     sat,              &
+                    MeasAereResis_1,  &
+                    MeasAereResis_2,  &
+                    c,                &
                     tranloss,         & ! Out
                     aere,             & ! Out
                     oxaere)             ! Out  
@@ -2658,9 +2735,11 @@ contains
 
     use elm_varcon       , only : rpi
     use CH4varcon        , only : transpirationloss, usefrootc, use_aereoxid_prog
+    use clm_time_manager , only : get_curr_calday
     
     ! Arguments (in)
-    
+
+    integer, intent(in)  :: c
     logical, intent(in)  :: is_vegetated
     real(r8), intent(in) :: watsat(:)
     real(r8), intent(in) :: h2osoi_vol(:)
@@ -2699,12 +2778,33 @@ contains
     real(r8) :: anpp, nppratio
     real(r8) :: conc_ch4_wat
     real(r8) :: aerecond    ! aerenchyma conductance (m/s)
+    real(r8) :: MeasAereResis_1   ! Per leaf area resistance to methane flux measured using chamber measurements - First Wetland Vegetation (s/m)
+    real(r8) :: MeasAereResis_2  ! Per leaf area resistance to methane flux measured using chamber measurements - Second Wetland Vegetation (s/m)
+    real(r8) :: PftAereParam! pft-aerenchyma parameter used in aerecond derivation (s/m2)
+
+    !LOCAL VARIABLES:
+    integer :: jday        ! julian day of the year
+    
     real(r8), parameter :: smallnumber = 1.e-12_r8
+
+    jday =  get_curr_calday()
     
     diffus_aere = d_con_g(1,1)*1.e-4_r8  ! for CH4: m^2/s
     ! This parameter is poorly constrained and should be done on a PFT-specific basis...
 
-
+    !Calculated Aerenchyma pft-specific conducatance based on leaf chamber measurements
+    PftAereParam = 0.0_r8
+    
+    do j=1,nlevsoi   
+       PftAereParam = PftAereParam + rootfr(j)/z(j)
+    enddo
+    
+    if (c == 17) then
+       PftAereParam = MeasAereResis_1*PftAereParam
+    elseif (c == 18) then
+       PftAereParam = MeasAereResis_2*PftAereParam
+    endif
+    
     do j=1,nlevsoi
 
        ! Calculate transpiration loss
@@ -2764,19 +2864,22 @@ contains
 
           k_h_inv = exp(-c_h_inv(1) * (1._r8 / t_soisno(j) - 1._r8 / kh_tbase) + log (kh_theta(1))) ! (4.12) Wania (L atm/mol)
           k_h_cc = t_soisno(j) / k_h_inv * rgasLatm ! (4.21) Wania [(mol/m3w) / (mol/m3g)]
-          aerecond = area_tiller * rootfr(j) * diffus_aere / (z(j)*CH4ParamsInst%rob)
+          !aerecond = area_tiller * rootfr(j) * diffus_aere / (z(j)*CH4ParamsInst%rob)
+          aerecond = (1._r8/(z(j)*PftAereParam))*rootfr(j)*elai
+          
           ! Add in boundary layer resistance
           aerecond = 1._r8 / (1._r8/(aerecond+smallnumber) + 1._r8/(grnd_ch4_cond+smallnumber))
 
           aere(j) = aerecond * (conc_ch4(j)/watsat(j)/k_h_cc - c_atm(1)) / dz(j) ![mol/m3-total/s]
           !ZS: Added watsat & Henry's const.
           aere(j) = max(aere(j), 0._r8) ! prevent backwards diffusion
-
+          
           ! Do oxygen diffusion into layer
           k_h_inv = exp(-c_h_inv(2) * (1._r8 / t_soisno(j) - 1._r8 / kh_tbase) + log (kh_theta(2)))
           k_h_cc = t_soisno(j) / k_h_inv * rgasLatm ! (4.21) Wania [(mol/m3w) / (mol/m3g)]
-          oxdiffus = diffus_aere * d_con_g(2,1) / d_con_g(1,1) ! adjust for O2:CH4 molecular diffusion
-          aerecond = area_tiller * rootfr(j) * oxdiffus / (z(j)*CH4ParamsInst%rob)
+          !oxdiffus = diffus_aere * d_con_g(2,1) / d_con_g(1,1) ! adjust for O2:CH4 molecular diffusion
+          !aerecond = area_tiller * rootfr(j) * oxdiffus / (z(j)*CH4ParamsInst%rob)
+          aerecond = (1._r8/(z(j)*PftAereParam))*rootfr(j)*elai
           aerecond = 1._r8 / (1._r8/(aerecond+smallnumber) + 1._r8/(grnd_ch4_cond+smallnumber))
           oxaere(j) = -aerecond *(conc_o2(j)/watsat(j)/k_h_cc - c_atm(2)) / dz(j) ![mol/m3-total/s]
           oxaere(j) = max(oxaere(j), 0._r8)
@@ -3423,7 +3526,7 @@ contains
                   end if
                endif ! Above/below the WT
                diffus(c,j) = max(diffus(c,j), smallnumber) ! Prevent overflow
-
+               
             enddo ! fp
          enddo ! j
 
@@ -3721,6 +3824,9 @@ contains
   !-----------------------------------------------------------------------
   subroutine get_jwt (bounds, num_methc, filter_methc, jwt, &
        soilstate_vars )
+
+    use elm_varcon       , only : zisoi
+    use elm_varctl         , only : read_wetl_surf_wat_elev_from_surf 
     !
     ! !DESCRIPTION:
     ! Finds the first unsaturated layer going up. Also allows a perched water table over ice.
@@ -3736,7 +3842,7 @@ contains
     ! !LOCAL VARIABLES:
     real(r8) :: f_sat    ! volumetric soil water defining top of water table or where production is allowed
     integer  :: c,j,perch! indices
-    integer  :: fc       ! filter column index
+    integer  :: fc,l       ! filter column index
     !-----------------------------------------------------------------------
 
 
@@ -3775,6 +3881,10 @@ contains
          if (jwt(c) == perch .and. h2osoi_vol(c,1) > f_sat * watsat(c,1)) then ! missed that the top layer is saturated
             jwt(c) = 0
          endif
+
+         !Force Water Level in Unsaturated Soil
+         l = col_pp%landunit(c)
+                           
       end do
 
     end associate
