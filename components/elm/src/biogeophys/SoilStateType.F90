@@ -332,6 +332,7 @@ contains
     use SharedParamsMod   , only : ParamsShareInst
     use FuncPedotransferMod , only : pedotransf, get_ipedof
     use RootBiophysMod      , only : init_vegrootfr
+    use elm_varctl         , only : read_wetl_surf_wat_elev_from_surf 
     !
     ! !ARGUMENTS:
     class(soilstate_type) :: this
@@ -757,7 +758,7 @@ contains
                 end if
                 this%hksat_col(c,lev)  = uncon_frac*uncon_hksat + (perc_frac*om_frac)*om_hksat
 
-                if ((lun_pp%itype(l) == istwet) .and. (lev == nlevbed .or. lev == nlevbed-1)) then
+                if ((lun_pp%itype(l) == istwet) .and. (.not. read_wetl_surf_wat_elev_from_surf) .and. (lev == nlevbed .or. lev == nlevbed-1)) then
                    this%hksat_col(c,lev) = 0.0
                 endif
 

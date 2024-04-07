@@ -108,6 +108,7 @@ module ColumnDataType
     real(r8), pointer :: h2osoi_ice         (:,:) => null() ! ice lens (-nlevsno+1:nlevgrnd) (kg/m2)
     real(r8), pointer :: h2osoi_vol         (:,:) => null() ! volumetric soil water (0<=h2osoi_vol<=watsat) (1:nlevgrnd) (m3/m3)
     real(r8), pointer :: h2osfc             (:)   => null() ! surface water (kg/m2)
+    real(r8), pointer :: h2osfc_wet             (:)   => null() ! wetland surface water (kg/m2)
     real(r8), pointer :: h2ocan             (:)   => null() ! canopy water integrated to column (kg/m2)
     real(r8), pointer :: total_plant_stored_h2o(:)=> null() ! total water in plants (kg/m2)
     real(r8), pointer :: wslake_col         (:)   => null() ! col lake water storage (mm H2O)
@@ -1331,7 +1332,8 @@ contains
     allocate(this%h2osoi_liq         (begc:endc,-nlevsno+1:nlevgrnd)) ; this%h2osoi_liq         (:,:) = nan
     allocate(this%h2osoi_ice         (begc:endc,-nlevsno+1:nlevgrnd)) ; this%h2osoi_ice         (:,:) = nan
     allocate(this%h2osoi_vol         (begc:endc, 1:nlevgrnd))         ; this%h2osoi_vol         (:,:) = nan
-    allocate(this%h2osfc             (begc:endc))                     ; this%h2osfc             (:)   = nan   
+    allocate(this%h2osfc             (begc:endc))                     ; this%h2osfc             (:)   = nan
+    allocate(this%h2osfc_wet             (begc:endc))                     ; this%h2osfc_wet             (:)   = nan
     allocate(this%h2ocan             (begc:endc))                     ; this%h2ocan             (:)   = nan 
     allocate(this%wslake_col         (begc:endc))                     ; this%wslake_col         (:)   = nan
     allocate(this%total_plant_stored_h2o(begc:endc))                  ; this%total_plant_stored_h2o(:)= nan  
@@ -1422,7 +1424,12 @@ contains
     this%h2osfc(begc:endc) = spval
      call hist_addfld1d (fname='H2OSFC',  units='mm',  &
           avgflag='A', long_name='surface water depth', &
-           ptr_col=this%h2osfc)
+          ptr_col=this%h2osfc)
+
+     this%h2osfc_wet(begc:endc) = spval
+     call hist_addfld1d (fname='H2OSFC_WET',  units='mm',  &
+          avgflag='A', long_name='wetland surface water depth', &
+           ptr_col=this%h2osfc_wet)
 
     this%h2osoi_vol(begc:endc,:) = spval
      call hist_addfld2d (fname='H2OSOI',  units='mm3/mm3', type2d='levgrnd', &
@@ -1562,6 +1569,7 @@ contains
        this%wf2(c)                    = spval
        this%total_plant_stored_h2o(c) = 0._r8
        this%h2osfc(c)                 = 0._r8
+       this%h2osfc_wet(c)                 = 0._r8
        this%h2ocan(c)                 = 0._r8
        this%frac_h2osfc(c)            = 0._r8
        this%h2orof(c)                 = 0._r8
@@ -1749,6 +1757,14 @@ contains
          interpinic_flag='interp', readvar=readvar, data=this%h2osfc)
     if (flag=='read' .and. .not. readvar) then
        this%h2osfc(bounds%begc:bounds%endc) = 0.0_r8
+    end if
+
+    call restartvar(ncid=ncid, flag=flag, varname='H2OSFC_WET', xtype=ncd_double,  &
+         dim1name='column', &
+         long_name='wetland surface water', units='kg/m2', &
+         interpinic_flag='interp', readvar=readvar, data=this%h2osfc_wet)
+    if (flag=='read' .and. .not. readvar) then
+       this%h2osfc_wet(bounds%begc:bounds%endc) = 0.0_r8
     end if
 
     if(do_budgets) then 
@@ -5409,7 +5425,7 @@ contains
     this%qflx_h2osfc_surf(begc:endc) = spval
      call hist_addfld1d (fname='QH2OSFC',  units='mm/s',  &
           avgflag='A', long_name='surface water runoff', &
-           ptr_col=this%qflx_h2osfc_surf)
+          ptr_col=this%qflx_h2osfc_surf)
 
     this%qflx_drain_perched(begc:endc) = spval
      call hist_addfld1d (fname='QDRAI_PERCH',  units='mm/s',  &

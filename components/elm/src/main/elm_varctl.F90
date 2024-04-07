@@ -339,7 +339,7 @@ module elm_varctl
 
   ! moved hist_wrtch4diag from histFileMod.F90 to here - caused compiler error with intel
   ! namelist: write CH4 extra diagnostic output
-  logical, public :: hist_wrtch4diag = .false.
+  logical, public :: hist_wrtch4diag = .true.
 
   !----------------------------------------------------------
   ! ED/FATES
