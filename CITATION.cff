@@ -17,13 +17,12 @@ authors:
     email: bohrer.17@osu.edu
   - given-names: Qing
     family-names: Zhu
-    orcid: ' https://orcid.org/0000-0003-2441-944X'
+    orcid: 'https://orcid.org/0000-0003-2441-944X'
     email: qzhu@lbl.gov
   - given-names: William J.
     family-names: Riley
     orcid: 'https://orcid.org/0000-0002-4615-2304'
     email: wjriley@lbl.gov
-version: 1.0.0
 repository-code: 'https://github.com/bohrer-lab/ELM_WetlandLandunit_Perlmutter'
 license: BSD-3-Clause
 abstract: >-
