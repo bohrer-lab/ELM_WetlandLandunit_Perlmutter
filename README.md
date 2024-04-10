@@ -1,79 +1,14 @@
-[![E3SM Logo](https://e3sm.org/wp-content/themes/e3sm/assets/images/e3sm-logo.png)](https://e3sm.org)
-
-Energy Exascale Earth System Model (E3SM)
+ELM-Wet
 ================================================================================
+ELM-Wet is a modified version of the E3SM Land Model (ELM) that improves representation of wetlands.
+ELM-Wet implements a wetland land unit with sub-grid representation of eco-hydrological patches
+and hydrological forcing.
 
-E3SM is a state-of-the-art fully coupled model of the Earth's climate including
-important biogeochemical and cryospheric processes. It is intended to address
-the most challenging and demanding climate-change research problems and
-Department of Energy mission needs while efficiently using DOE Leadership
-Computing Facilities.  
-
-DOI: [10.11578/E3SM/dc.20230110.5](http://dx.doi.org/10.11578/E3SM/dc.20230110.5)
-
-Please visit the [project website](https://e3sm.org) or our [Confluence site](https://acme-climate.atlassian.net/wiki/spaces/DOC/overview)
-for further details.
-
-For questions about the model, use [Github Discussions](https://github.com/E3SM-Project/E3SM/discussions)
-
-Table of Contents 
---------------------------------------------------------------------------------
-- [Quick Start](#quickstart)
-- [Supported Machines](#supportedmachines)
-- [Running](#running)
-- [Contributing](#contributing)
-- [Acknowledge](#acknowledge)
-- [License](#license)
-
-Quick Start
---------------------------------------------------------------------------------
-The [Quick Start](https://e3sm.org/model/running-e3sm/e3sm-quick-start/) page 
-includes instructions on obtaining the necessary code and input data for model 
-setup and execution on a supported machine.
-
-Supported Machines 
---------------------------------------------------------------------------------
-E3SM is a high-performance computing application and generally requires a
-capable compute cluster to run a scientifically validated case at a useful
-simulation speed.
-
-To run E3SM, it is recommended that you obtain time on a 
-[Supported Machine](https://e3sm.org/model/running-e3sm/supported-machines/).
-
-Running
---------------------------------------------------------------------------------
-Please refer to [Running E3SM](https://e3sm.org/model/running-e3sm/) 
- for instructions on running the model. 
-
-Contributing
---------------------------------------------------------------------------------
-Please refer to [Contributing](CONTRIBUTING.md) for details on our code development
-process.
+ELM-Wet was forked from E3SM. For more information about E3SM, please see the
+[E3SM repository](https://github.com/E3SM-Project/E3SM/) and [project website](https://e3sm.org).
 
 Acknowledgement
 --------------------------------------------------------------------------------
-The Energy Exascale Earth System Model (E3SM) Project should be acknowledged in
-publications as the origin of the model using
-[these guidelines](https://e3sm.org/resources/policies/acknowledge-e3sm/).
-
-In addition, the software should be cited.  For your convenience,
-the following BibTeX entry is provided.
-```TeX
-@misc{e3sm-model,
-	title = {{Energy Exascale Earth System Model (E3SM)}},
-	author = {{E3SM Project}},
-	abstractNote = {{E3SM} is a state-of-the-art fully coupled model of the {E}arth's 
-		climate including important biogeochemical and cryospheric processes.},
-	howpublished = {[Computer Software] \url{https://dx.doi.org/10.11578/E3SM/dc.20230110.5}},
-	url = {https://dx.doi.org/10.11578/E3SM/dc.20230110.5},
-	doi = {10.11578/E3SM/dc.20230110.5},
-	year = 2023,
-	month = jan,
-}
-```
-
-License
---------------------------------------------------------------------------------
-The E3SM model is available under a BSD 3-clause license.
-Please see [LICENSE](LICENSE) for details.
-
+The ELM-Wet software should be cited in publications according to the metadata in the CITATION file.
+As ELM-Wet is a modification of E3SM, please also acknowledge the E3SM Project in
+publications using [these guidelines](https://e3sm.org/resources/policies/acknowledge-e3sm/).

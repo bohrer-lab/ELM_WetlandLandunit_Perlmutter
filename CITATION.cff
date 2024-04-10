@@ -2,14 +2,41 @@
 # Visit https://bit.ly/cffinit to generate yours today!
 
 cff-version: 1.2.0
-title: Energy Exascale Earth System Model
-message: '  If you use this software, please cite it using the metadata from this file.'
+title: ELM-Wet
+message: >-
+  If you use this software, please cite it as below.
 type: software
 authors:
-  - given-names: E3SM
-    family-names: Project
-version: 2.1.0
-doi: 10.11578/E3SM/dc.20230110.5
-repository-code: 'https://github.com/E3SM-Project/E3SM'
-url: 'https://e3sm.org'
+  - given-names: Theresia
+    family-names: Yazbeck
+    orcid: 'https://orcid.org/0000-0002-6073-0617'
+    email: yazbeck.3@buckeyemail.osu.edu
+  - given-names: Gil
+    family-names: Bohrer
+    orcid: 'https://orcid.org/0000-0002-9209-9540'
+    email: bohrer.17@osu.edu
+  - given-names: Qing
+    family-names: Zhu
+    orcid: ' https://orcid.org/0000-0003-2441-944X'
+    email: qzhu@lbl.gov
+  - given-names: William J.
+    family-names: Riley
+    orcid: 'https://orcid.org/0000-0002-4615-2304'
+    email: wjriley@lbl.gov
+version: 1.0.0
+repository-code: 'https://github.com/bohrer-lab/ELM_WetlandLandunit_Perlmutter'
 license: BSD-3-Clause
+abstract: >-
+  ELM-Wet: Inclusion of a wetland land unit with sub-grid
+  representation of eco-hydrological patches and
+  hydrological forcing in the E3SM Land Model (ELM)
+references:
+- title: Energy Exascale Earth System Model
+  authors:
+    - given-names: E3SM
+      family-names: Project
+  type: software
+  version: 2.1.0
+  doi: 10.11578/E3SM/dc.20230110.5
+  repository-code: 'https://github.com/E3SM-Project/E3SM'
+  url: 'https://e3sm.org'
