@@ -288,6 +288,8 @@ module pftvarcon
   real(r8), allocatable :: br_xr(:)            !Base rate for excess respiration
   real(r8)              :: tc_stress           !Critial temperature for moisture stress
   real(r8), allocatable :: vcmax_np1(:)        !vcmax~np relationship coefficient
+  real(r8), allocatable :: vcmax_np1_1(:)      !vcmax~np relationship coefficient - First Wetland Vegetation
+  real(r8), allocatable :: vcmax_np1_2(:)      !vcmax~np relationship coefficient - Second Wetland Vegetation
   real(r8), allocatable :: vcmax_np2(:)        !vcmax~np relationship coefficient
   real(r8), allocatable :: vcmax_np3(:)        !vcmax~np relationship coefficient
   real(r8), allocatable :: vcmax_np4(:)        !vcmax~np relationship coefficient
@@ -568,6 +570,8 @@ contains
     allocate( livewdcp_obs_flex       (0:mxpft,1:2) )
     allocate( deadwdcp_obs_flex       (0:mxpft,1:2) ) 
     allocate( vcmax_np1          (0:mxpft) )
+    allocate( vcmax_np1_1        (0:mxpft) )
+    allocate( vcmax_np1_2        (0:mxpft) )
     allocate( vcmax_np2          (0:mxpft) )
     allocate( vcmax_np3          (0:mxpft) )
     allocate( vcmax_np4          (0:mxpft) )
@@ -941,6 +945,10 @@ contains
 
         call ncd_io('vcmax_np1',vcmax_np1, 'read', ncid, readvar=readv, posNOTonfile=.true.)
         if ( .not. readv ) call endrun(msg=' ERROR: error in reading in vcmax_np data'//errMsg(__FILE__, __LINE__))
+        call ncd_io('vcmax_np1_1',vcmax_np1_1, 'read', ncid, readvar=readv, posNOTonfile=.true.)
+        if ( .not. readv ) call endrun(msg=' ERROR: error in reading in vcmax_np_1 data'//errMsg(__FILE__, __LINE__))
+        call ncd_io('vcmax_np1_2',vcmax_np1_2, 'read', ncid, readvar=readv, posNOTonfile=.true.)
+        if ( .not. readv ) call endrun(msg=' ERROR: error in reading in vcmax_np_2 data'//errMsg(__FILE__, __LINE__))
         call ncd_io('vcmax_np2',vcmax_np2, 'read', ncid, readvar=readv, posNOTonfile=.true.)
         if ( .not. readv ) call endrun(msg=' ERROR: error in reading in vcmax_np data'//errMsg(__FILE__, __LINE__))
         call ncd_io('vcmax_np3',vcmax_np3, 'read', ncid, readvar=readv, posNOTonfile=.true.)

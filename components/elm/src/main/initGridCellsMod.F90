@@ -417,7 +417,7 @@ contains
 
     if (npfts > 0) then
 
-       if (npfts /=1 .and. ltype /= istice_mec) then
+       if (npfts /=1 .and. ltype /= istice_mec .and. ltype /= istwet) then
           write(iulog,*)' set_landunit_wet_ice_lake: landunit must'// &
                ' have one pft '
           write(iulog,*)' current value of npfts=',npfts
@@ -453,7 +453,10 @@ contains
           !Currently assume that wetland landunit has c3grass characteristics
 
           call add_landunit(li=li, ti=ti, ltype=ltype, wttopounit=wtlunit2topounit)
-          call add_column(ci=ci, li=li, ctype=ltype, wtlunit=1.0_r8)
+          call add_column(ci=ci, li=li, ctype=ltype, wtlunit=0.5_r8)
+          call add_patch(pi=pi, ci=ci, ptype=nc3_nonarctic_grass, wtcol=1.0_r8)
+
+          call add_column(ci=ci, li=li, ctype=ltype, wtlunit=0.5_r8)
           call add_patch(pi=pi, ci=ci, ptype=nc3_nonarctic_grass, wtcol=1.0_r8)
 
        else

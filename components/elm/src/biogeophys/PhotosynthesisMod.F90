@@ -226,7 +226,7 @@ contains
     use elm_varcon     , only : rgas, tfrz
     use elm_varctl     , only : carbon_only
     use pftvarcon      , only : nbrdlf_dcd_tmp_shrub, nsoybean, nsoybeanirrig, npcropmin
-    use pftvarcon      , only : vcmax_np1, vcmax_np2, vcmax_np3, vcmax_np4, jmax_np1, jmax_np2, jmax_np3
+    use pftvarcon      , only : vcmax_np1, vcmax_np2, vcmax_np3, vcmax_np4, jmax_np1, jmax_np2, jmax_np3, vcmax_np1_1, vcmax_np1_2
     !
     ! !ARGUMENTS:
     type(bounds_type)      , intent(in)    :: bounds
@@ -649,6 +649,13 @@ contains
                      lpc(p) = leafp(p) / (total_lai * sum_nscaler)
                      lnc(p) = min(max(lnc(p),0.25_r8),3.0_r8) ! based on doi: 10.1002/ece3.1173
                      lpc(p) = min(max(lpc(p),0.014_r8),0.85_r8) ! based on doi: 10.1002/ece3.1173
+                     
+                     if (c == 17) then
+                        vcmax_np1 = vcmax_np1_1
+                     elseif (c == 18) then
+                        vcmax_np1 = vcmax_np1_2
+                     endif
+                     
                      vcmax25top = exp(vcmax_np1(veg_pp%itype(p)) + vcmax_np2(veg_pp%itype(p))*log(lnc(p)) + &
                           vcmax_np3(veg_pp%itype(p))*log(lpc(p)) + vcmax_np4(veg_pp%itype(p))*log(lnc(p))*log(lpc(p)))&
                           * dayl_factor(p)
@@ -1595,7 +1602,7 @@ contains
     !use elm_varctl        , only : lnc_opt, reduce_dayl_factor, vcmax_opt
     use elm_varpar        , only : nlevsoi
     use pftvarcon         , only : nbrdlf_dcd_tmp_shrub, npcropmin
-    use pftvarcon         , only : vcmax_np1, vcmax_np2, vcmax_np3, vcmax_np4, jmax_np1, jmax_np2, jmax_np3
+    use pftvarcon         , only : vcmax_np1, vcmax_np2, vcmax_np3, vcmax_np4, jmax_np1, jmax_np2, jmax_np3, vcmax_np1_1, vcmax_np1_2
     use ColumnType        , only : col_pp
 
     !
@@ -2187,6 +2194,13 @@ contains
                      lpc(p) = leafp(p) / (total_lai * sum_nscaler)
                      lnc(p) = min(max(lnc(p),0.25_r8),3.0_r8) ! based on doi:10.1002/ece3.1173
                      lpc(p) = min(max(lpc(p),0.014_r8),0.85_r8) ! based on doi:10.1002/ece3.1173
+
+                     if (c == 17) then
+                        vcmax_np1 = vcmax_np1_1
+                     elseif (c == 18) then
+                        vcmax_np1 = vcmax_np1_2
+                     endif
+                     
                      vcmax25top = exp(vcmax_np1(veg_pp%itype(p)) + vcmax_np2(veg_pp%itype(p))*log(lnc(p)) + &
                           vcmax_np3(veg_pp%itype(p))*log(lpc(p)) + vcmax_np4(veg_pp%itype(p))*log(lnc(p))*log(lpc(p)))&
                           * dayl_factor(p)

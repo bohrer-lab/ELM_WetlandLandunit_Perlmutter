@@ -39,7 +39,7 @@ contains
     ! Obtain gridcell properties
     !
     ! !USES
-    use elm_varpar  , only : natpft_size, cft_size, maxpatch_urb, maxpatch_glcmec
+    use elm_varpar  , only : natpft_size, cft_size, maxpatch_urb, maxpatch_glcmec, maxpatch_wet
     use elm_varctl  , only : create_crop_landunit
     use elm_varsur  , only : wt_lunit, urban_valid, wt_glc_mec
     use landunit_varcon  , only : istsoil, istcrop, istice, istice_mec, istdlak, istwet, &
@@ -228,7 +228,7 @@ contains
 
        npfts_per_lunit = 0
        if (wt_lunit(gi,t, istwet) > 0.0_r8) then
-          npfts_per_lunit = npfts_per_lunit + 1
+          npfts_per_lunit = npfts_per_lunit + maxpatch_wet
        end if
        if (npfts_per_lunit > 0) then
           ilunits = ilunits + 1
@@ -333,7 +333,7 @@ contains
     ! Obtain topounit properties
     !
     ! !USES
-    use elm_varpar  , only : natpft_size, cft_size, maxpatch_urb, maxpatch_glcmec
+    use elm_varpar  , only : natpft_size, cft_size, maxpatch_urb, maxpatch_glcmec, maxpatch_wet
     use elm_varctl  , only : create_crop_landunit
     use elm_varsur  , only : wt_lunit, urban_valid, wt_glc_mec
     use landunit_varcon  , only : istsoil, istcrop, istice, istice_mec, istdlak, istwet, &
@@ -492,7 +492,7 @@ contains
 
     npfts_per_lunit = 0
     if (wt_lunit(gi,tgi, istwet) > 0.0_r8) then
-       npfts_per_lunit = npfts_per_lunit + 1
+       npfts_per_lunit = npfts_per_lunit + maxpatch_wet
     end if
     if (npfts_per_lunit > 0) then
        ilunits = ilunits + 1

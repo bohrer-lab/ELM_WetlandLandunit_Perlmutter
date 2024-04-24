@@ -58,6 +58,7 @@ module elm_varpar
   integer :: numcft      =  36     ! actual # of crops
   logical :: crop_prog   = .true.  ! If prognostic crops is turned on
   integer :: maxpatch_urb= 5       ! max number of urban patches (columns) in urban landunit
+  integer :: maxpatch_wet= 2       ! max number of wetland patches (columns) in wetland landunit
 
   integer :: mxpft_nc            ! maximum number of PFT's when use_crop=False;
 
